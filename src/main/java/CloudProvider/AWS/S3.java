@@ -1,4 +1,4 @@
-package CloudProvider.S3;
+package CloudProvider.AWS;
 
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
