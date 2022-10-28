@@ -1,16 +1,5 @@
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import CloudProvider.AWS.AwsCloudClient;
 
@@ -18,8 +7,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
     // Encode an image in a base64 like string
 
-        // image path declaration
-        String imgPath = "./src/main/resources/coucou.jpg";
+        // // image path declaration
+        // String imgPath = "./src/main/resources/coucou.jpg";
 
         // // read image from file
         // FileInputStream stream = new FileInputStream(imgPath);
@@ -40,14 +29,11 @@ public class Main {
         // out.close();
         // stream.close();
         // System.out.println(dataRow);
-
+        String imgPath = "./src/main/resources/coucou.jpg";
         AwsCloudClient client = AwsCloudClient.getInstance();
-        client.CreateBucket("amt.team03.diduno.education");
+        client.SetBucketUrl("amt.team03.diduno.education");
         client.CreateObject("coucou1", imgPath);
-        Map<String, Object> map = new HashMap<String, Object>();
-        // Put elements to the map
-        map.put("bucket", "amt.team03.diduno.education");
-        List<String> result = client.Execute("coucou1", map);
+        List<String> result = client.Execute("coucou1", null);
         for(String res : result){
             System.out.println(res);
         }

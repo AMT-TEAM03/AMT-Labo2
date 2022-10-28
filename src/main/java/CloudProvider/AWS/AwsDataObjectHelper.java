@@ -20,41 +20,37 @@ import software.amazon.awssdk.core.sync.RequestBody;
 
 public class AwsDataObjectHelper implements IDataObject{
     private S3Client s3Client;
-    private String bucket;
 
-    public AwsDataObjectHelper(ProfileCredentialsProvider profile, String bucket){
-        this.bucket = bucket;
+    public AwsDataObjectHelper(ProfileCredentialsProvider profile){
         s3Client = S3Client.builder()
                 .credentialsProvider(profile)
                 .build();
     }
 
     public void CreateObject(String objectKey, String objectPath){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
         try {
             Map<String, String> metadata = new HashMap<>();
             metadata.put("x-amz-meta-myVal", "test");
             PutObjectRequest putOb = PutObjectRequest.builder()
-                    .bucket(this.bucket)
+                    .bucket(bucketUrl)
                     .key(objectKey)
                     .metadata(metadata)
                     .build();
 
             PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(getObjectFile(objectPath)));
             System.out.println(response.eTag());
-            // return response.eTag();
         } catch (S3Exception e) {
             System.err.println(e.getMessage());
         }
-        // return null;
     }
 
-    public void CreateBucket(String bucket){
-        this.bucket = bucket;
-    }
-
-    public String GetBucket(){
-        return this.bucket;
-    }
+    // public void CreateBucket(String bucket){
+    //     ????? We don't have permission....
+    // }
 
     public List<String> listBuckets(){
         ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder().build();

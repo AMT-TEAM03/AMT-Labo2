@@ -24,10 +24,14 @@ public class AwsLabelDetectorHelper implements ILabelDetector {
     }
 
     public List<String> Execute(String imageKey, Map<String, Object> params){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
         List<Label> labels;
         try {
             S3Object s3Object = S3Object.builder()
-                    .bucket((String)params.get("bucket"))
+                    .bucket(bucketUrl)
                     .name(imageKey)
                     .build();
 
@@ -57,7 +61,6 @@ public class AwsLabelDetectorHelper implements ILabelDetector {
                 if(label_found > 10)
                     break;
             }
-//                System.out.println(label.name() + ": " + label.confidence().toString());
         }
         return result;
     }

@@ -12,10 +12,11 @@ public class AwsCloudClient implements ICloudClient {
     // Private attributes
     private AwsDataObjectHelper objectHelper;
     private AwsLabelDetectorHelper labelHelper;
+    private String bucketUrl = null;
 
     private AwsCloudClient(){
         ProfileCredentialsProvider profile = ProfileCredentialsProvider.create();
-        objectHelper = new AwsDataObjectHelper(profile, null);
+        objectHelper = new AwsDataObjectHelper(profile);
         labelHelper = new AwsLabelDetectorHelper(profile);
     }
 
@@ -26,6 +27,14 @@ public class AwsCloudClient implements ICloudClient {
         return INSTANCE;
     }
 
+    public String GetBucketUrl(){
+        return this.bucketUrl;
+    }
+
+    public void SetBucketUrl(String bucketUrl){
+        this.bucketUrl = bucketUrl;
+    }
+
     public void Close() {
         objectHelper.Close();
         labelHelper.Close();
@@ -34,10 +43,6 @@ public class AwsCloudClient implements ICloudClient {
 
     public void CreateObject(String objectName, String objectPath){
         objectHelper.CreateObject(objectName, objectPath);
-    }
-
-    public void CreateBucket(String bucket){
-        objectHelper.CreateBucket(bucket);
     }
 
     public List<String> Execute(String imageUri, Map<String, Object> params){
