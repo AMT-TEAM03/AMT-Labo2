@@ -1,5 +1,5 @@
 package CloudProvider;
 
 public interface IDataObject {
-    public void Create(String objectName);
+    public void CreateObject(String objectName, String objectPath);
 }
