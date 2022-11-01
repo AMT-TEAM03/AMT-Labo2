@@ -1,6 +1,10 @@
 package CloudProvider.AWS;
 
+import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import CloudProvider.IDataObject;
@@ -9,6 +13,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -23,6 +28,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
@@ -36,10 +44,14 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
     }
 
-    public void CreateObject(String objectKey, String base64Img){
+    public URL CreateObject(String objectKey, String base64Img){
         String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
+        }
+        if(presigner == null){
+            throw new Error("No Presigner to generate URL...");
         }
         if(DoesObjectExists(objectKey)){
             throw new Error("File already exists in the bucket...");
@@ -51,9 +63,30 @@ public class AwsDataObjectHelper implements IDataObject{
                     .build();
             byte[] bImg = java.util.Base64.getDecoder().decode(base64Img);
             PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(bImg));
-            System.out.println(response.eTag());
+            // Generate URL valid for 60 minutes
+            // Create a GetObjectRequest to be pre-signed
+            GetObjectRequest getObjectRequest =
+                    GetObjectRequest.builder()
+                                    .bucket(bucketUrl)
+                                    .key(objectKey)
+                                    .build();
+
+            // Create a GetObjectPresignRequest to specify the signature duration
+            GetObjectPresignRequest getObjectPresignRequest =
+                GetObjectPresignRequest.builder()
+                                        .signatureDuration(Duration.ofMinutes(60))
+                                        .getObjectRequest(getObjectRequest)
+                                        .build();
+
+            // Generate the presigned request
+            PresignedGetObjectRequest presignedGetObjectRequest =
+                presigner.presignGetObject(getObjectPresignRequest);
+        
+            // Log the presigned URL, for example.
+            return presignedGetObjectRequest.url();
         } catch (S3Exception e) {
             System.err.println(e.getMessage());
+            return null;
         }
     }
 
@@ -103,10 +136,6 @@ public class AwsDataObjectHelper implements IDataObject{
         } catch (NoSuchKeyException e) {
             return false;
         }
-    }
-
-    public String Publish(String objectKey){
-        return "";
     }
 
     public void CreateBucket(String bucketName){
