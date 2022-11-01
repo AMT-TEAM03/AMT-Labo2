@@ -1,22 +1,37 @@
 package CloudProvider.AWS;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import CloudProvider.IDataObject;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.waiters.WaiterResponse;
 
 public class AwsDataObjectHelper implements IDataObject{
     private S3Client s3Client;
@@ -27,32 +42,149 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
     }
 
-    public void CreateObject(String objectKey, String objectPath){
+    public URL CreateObject(String objectKey, String base64Img){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
+        if(presigner == null){
+            throw new Error("No Presigner to generate URL...");
+        }
+        if(DoesObjectExists(objectKey)){
+            throw new Error("File already exists in the bucket...");
+        }
+        try {
+            PutObjectRequest putOb = PutObjectRequest.builder()
+                    .bucket(bucketUrl)
+                    .key(objectKey)
+                    .build();
+            byte[] bImg = java.util.Base64.getDecoder().decode(base64Img);
+            PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(bImg));
+            // Generate URL valid for 60 minutes
+            // Create a GetObjectRequest to be pre-signed
+            GetObjectRequest getObjectRequest =
+                    GetObjectRequest.builder()
+                                    .bucket(bucketUrl)
+                                    .key(objectKey)
+                                    .build();
+
+            // Create a GetObjectPresignRequest to specify the signature duration
+            GetObjectPresignRequest getObjectPresignRequest =
+                GetObjectPresignRequest.builder()
+                                        .signatureDuration(Duration.ofMinutes(60))
+                                        .getObjectRequest(getObjectRequest)
+                                        .build();
+
+            // Generate the presigned request
+            PresignedGetObjectRequest presignedGetObjectRequest =
+                presigner.presignGetObject(getObjectPresignRequest);
+        
+            // Log the presigned URL, for example.
+            return presignedGetObjectRequest.url();
+        } catch (S3Exception e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public void DeleteObject(String objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
+        DeleteObjectRequest delReq = DeleteObjectRequest.builder()
+                        .bucket(bucketUrl)
+                        .key(objectKey)
+                        .build();
+        s3Client.deleteObject(delReq);
+    }
+
+    public List<S3Object> ListObjects(){
         String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
         try {
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("x-amz-meta-myVal", "test");
-            PutObjectRequest putOb = PutObjectRequest.builder()
+            ListObjectsRequest listObjects = ListObjectsRequest
+                    .builder()
                     .bucket(bucketUrl)
-                    .key(objectKey)
-                    .metadata(metadata)
                     .build();
 
-            PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(getObjectFile(objectPath)));
-            System.out.println(response.eTag());
+            ListObjectsResponse res = s3Client.listObjects(listObjects);
+            return res.contents();
         } catch (S3Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println(e.awsErrorDetails().errorMessage());
+            return null;
+        }
+    }
+    
+    public boolean DoesObjectExists(String  objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                .bucket(bucketUrl)
+                .key(objectKey)
+                .build(); 
+        try {
+            s3Client.headObject(headObjectRequest);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
         }
     }
 
-    // public void CreateBucket(String bucket){
-    //     ????? We don't have permission....
-    // }
+    public void CreateBucket(String bucketName){
+        try {
+            S3Waiter s3Waiter = s3Client.waiter();
+            CreateBucketRequest bucketRequest = CreateBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
 
-    public List<String> listBuckets(){
+            s3Client.createBucket(bucketRequest);
+            HeadBucketRequest bucketRequestWait = HeadBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
+
+            // Wait until the bucket is created and print out the response.
+            WaiterResponse<HeadBucketResponse> waiterResponse = s3Waiter.waitUntilBucketExists(bucketRequestWait);
+            waiterResponse.matched().response().ifPresent(System.out::println);
+            System.out.println(bucketName + " is ready");
+        } catch (S3Exception e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+        }
+    }
+
+    public void DeleteBucket(String bucketName){
+        // To delete a bucket, all the objects in the bucket must be deleted first.
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+        ListObjectsV2Response listObjectsV2Response;
+
+        do {
+            listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+            for (S3Object s3Object : listObjectsV2Response.contents()) {
+                DeleteObjectRequest request = DeleteObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Object.key())
+                        .build();
+                s3Client.deleteObject(request);
+            }
+        } while (listObjectsV2Response.isTruncated());
+        // Then we delete the empty bucket
+        DeleteBucketRequest deleteBucketRequest = DeleteBucketRequest.builder()
+                .bucket(bucketName)
+                .build();
+
+        s3Client.deleteBucket(deleteBucketRequest);
+        s3Client.close();
+
+    }
+
+    public List<String> ListBuckets(){
         ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder().build();
         ListBucketsResponse listBucketsResponse = s3Client.listBuckets(listBucketsRequest);
         List<String> result = new ArrayList<String>();
@@ -62,30 +194,6 @@ public class AwsDataObjectHelper implements IDataObject{
 
     public void Close(){
         s3Client.close();
-    }
-
-    private static byte[] getObjectFile(String filePath) {
-        FileInputStream fileInputStream = null;
-        byte[] bytesArray = null;
-
-        try {
-            File file = new File(filePath);
-            bytesArray = new byte[(int) file.length()];
-            fileInputStream = new FileInputStream(file);
-            fileInputStream.read(bytesArray);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return bytesArray;
     }
 }
  

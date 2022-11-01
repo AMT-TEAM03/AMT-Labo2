@@ -1,5 +1,7 @@
 package CloudProvider;
 
+import java.net.URL;
+
 public interface IDataObject {
-    public void CreateObject(String objectName, String objectPath);
+    public URL CreateObject(String objectName, String objectPath);
 }
