@@ -4,15 +4,18 @@
 - Seem Thibault
 
 ## Débuter sur le projet
-Le projet utilise maven pour la gestion des dépendance, il faut donc utiliser  
+### Instalation de maven
+Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
+
+Une fois maven installé, il faut installer les dépendances avec la commande :  
 ```mvn clean install ```
 
 ### Mise en place des settings AWS nécessaires
-Actuellement, le projet est fait pour tourner avec AWS ete utilise [AWS S3](https://aws.amazon.com/s3/) pour le storge
-et [AWS Rekognition](https://aws.amazon.com/rekognition/) et plus spécifiquement [AWS Rekognition labels](https://aws.amazon.com/rekognition/)
+Actuellement, le projet est fait pour tourner avec AWS et utilise [AWS S3](https://aws.amazon.com/s3/) pour le storage
+et [AWS Rekognition](https://aws.amazon.com/rekognition/) et plus spécifiquement [AWS Rekognition labels](https://aws.amazon.com/rekognition/) pour la reconnaissance de paterne dans les images
 
 Le projet utilise les fichiers d'identification et de settings d'AWS. [Ce lien](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where) permet de savoir où sont stocké les identifiants et configurations.
-Si les fichiers n'existent pas, le CLI d'AWS permet de les créer à l'aide de la commande `aws configure`. Il est également possible
+Si les fichiers n'existent pas, le [CLI d'AWS](https://aws.amazon.com/cli/) permet de les créer à l'aide de la commande `aws configure`. Il est également possible
 de créer soit-même ses identifiants et ses configuration en respectant l'exemple de configuration du lien précédent et l'[AWS Credentials File Format](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html#credentials-file-format)
 
 ### Test et compilation
