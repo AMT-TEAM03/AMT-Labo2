@@ -41,6 +41,9 @@ public class AwsDataObjectHelper implements IDataObject{
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
+        if(DoesObjectExists(objectKey)){
+            throw new Error("File already exists in the bucket...");
+        }
         try {
             PutObjectRequest putOb = PutObjectRequest.builder()
                     .bucket(bucketUrl)
@@ -55,18 +58,26 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public void DeleteObject(String objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
         DeleteObjectRequest delReq = DeleteObjectRequest.builder()
-                        .bucket(AwsCloudClient.getInstance().GetBucketUrl())
+                        .bucket(bucketUrl)
                         .key(objectKey)
                         .build();
         s3Client.deleteObject(delReq);
     }
 
     public List<S3Object> ListObjects(){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
         try {
             ListObjectsRequest listObjects = ListObjectsRequest
                     .builder()
-                    .bucket(AwsCloudClient.getInstance().GetBucketUrl())
+                    .bucket(bucketUrl)
                     .build();
 
             ListObjectsResponse res = s3Client.listObjects(listObjects);
@@ -78,8 +89,12 @@ public class AwsDataObjectHelper implements IDataObject{
     }
     
     public boolean DoesObjectExists(String  objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
         HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
-                .bucket(AwsCloudClient.getInstance().GetBucketUrl())
+                .bucket(bucketUrl)
                 .key(objectKey)
                 .build(); 
         try {

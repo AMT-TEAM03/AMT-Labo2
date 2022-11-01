@@ -5,6 +5,7 @@ import java.util.Map;
 
 import CloudProvider.ICloudClient;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class AwsCloudClient implements ICloudClient {
     // Singleton
@@ -61,6 +62,10 @@ public class AwsCloudClient implements ICloudClient {
 
     public void DeleteObject(String objectKey){
         objectHelper.DeleteObject(objectKey);
+    }
+
+    public List<S3Object> ListObjects(){
+        return objectHelper.ListObjects();
     }
 
     public boolean DoesObjectExists(String objectKey){
