@@ -12,17 +12,25 @@ public class AwsCloudClient implements ICloudClient {
     // Private attributes
     private AwsDataObjectHelper objectHelper;
     private AwsLabelDetectorHelper labelHelper;
-    private String bucketUrl = null;
+    private String bucketUrl;
 
-    private AwsCloudClient(){
+    private AwsCloudClient(String bucketUrl){
         ProfileCredentialsProvider profile = ProfileCredentialsProvider.create();
         objectHelper = new AwsDataObjectHelper(profile);
         labelHelper = new AwsLabelDetectorHelper(profile);
+        this.bucketUrl = bucketUrl;
     }
 
-    public static AwsCloudClient getInstance() {
+    public static AwsCloudClient getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new AwsCloudClient();
+            AwsCloudClient.getInstance("amt.team03.diduno.education");
+        }
+        return INSTANCE;
+    }
+
+    public static AwsCloudClient getInstance(String bucketUrl) {
+        if(INSTANCE == null){
+            INSTANCE = new AwsCloudClient(bucketUrl);
         }
         return INSTANCE;
     }
@@ -35,14 +43,30 @@ public class AwsCloudClient implements ICloudClient {
         this.bucketUrl = bucketUrl;
     }
 
+    public List<String> ListBucket(){
+        return objectHelper.ListBuckets();
+    }
+
+    public void CreateBucket(String bucketName){
+        objectHelper.CreateBucket(bucketName);
+    }
+
+    public void DeleteBucket(String bucketName){
+        objectHelper.DeleteBucket(bucketName);
+    }
+
     public void Close() {
         objectHelper.Close();
         labelHelper.Close();
         INSTANCE = null;
     }
 
-    public void CreateObject(String objectName, String objectPath){
-        objectHelper.CreateObject(objectName, objectPath);
+    public void CreateObject(String objectName, String base64Img){
+        objectHelper.CreateObject(objectName, base64Img);
+    }
+
+    public void DeleteObject(String objectKey){
+        objectHelper.DeleteObject(objectKey);
     }
 
     public List<String> Execute(String imageUri, Map<String, Object> params){
