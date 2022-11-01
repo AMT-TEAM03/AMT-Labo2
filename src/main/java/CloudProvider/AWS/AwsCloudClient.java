@@ -55,12 +55,6 @@ public class AwsCloudClient implements ICloudClient {
         objectHelper.DeleteBucket(bucketName);
     }
 
-    public void Close() {
-        objectHelper.Close();
-        labelHelper.Close();
-        INSTANCE = null;
-    }
-
     public void CreateObject(String objectName, String base64Img){
         objectHelper.CreateObject(objectName, base64Img);
     }
@@ -69,7 +63,17 @@ public class AwsCloudClient implements ICloudClient {
         objectHelper.DeleteObject(objectKey);
     }
 
+    public boolean DoesObjectExists(String objectKey){
+        return objectHelper.DoesObjectExists(objectKey);
+    }
+
     public List<String> Execute(String imageUri, Map<String, Object> params){
         return labelHelper.Execute(imageUri, params);
+    }
+    
+    public void Close() {
+        objectHelper.Close();
+        labelHelper.Close();
+        INSTANCE = null;
     }
 }

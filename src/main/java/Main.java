@@ -31,7 +31,7 @@ public class Main {
         String dataRow = Base64.getEncoder().withoutPadding().encodeToString(data);
         out.close();
         stream.close();
-
+        // Test AwsCloudClient
         AwsCloudClient client = AwsCloudClient.getInstance();
         client.CreateObject("coucou2", dataRow);
         List<String> labels = client.Execute("coucou2", null);
