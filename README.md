@@ -1,6 +1,6 @@
 # AMT-Labo2
 ## Collaborateurs
-- Melly Jeremy  
+- Melly Jérémie  
 - Seem Thibault
 
 ## Débuter sur le projet
