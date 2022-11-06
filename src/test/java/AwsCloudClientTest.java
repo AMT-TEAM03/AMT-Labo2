@@ -5,14 +5,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Base64;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import CloudProvider.AWS.AwsCloudClient;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
-class AWSTest {
+class AwsCloudClientTest {
 
     static AwsCloudClient _s3Client;
     static String _base64Img;
@@ -41,19 +45,54 @@ class AWSTest {
         stream.close();
     }
 
+    @BeforeEach
+    void beforeEach(){
+        _s3Client.CreateObject("testing123", _base64Img);
+    }
+
     @Test
     void testCreateObject() {
-        URL url = _s3Client.CreateObject("testing123", _base64Img);
+        URL url = _s3Client.CreateObject("testing1234", _base64Img);
         assertNotNull(url);
-        assertTrue(_s3Client.DoesObjectExists("testing123"));
         // Expect this one to fail as already exist
-        assertThrows(Error.class, () -> _s3Client.CreateObject("testing123", _base64Img));
+        assertThrows(Error.class, () -> _s3Client.CreateObject("testing1234", _base64Img));
+        _s3Client.DeleteObject("testing1234");
+    }
+
+    @Test 
+    void testDoesObjectExists(){
+        assertTrue(_s3Client.DoesObjectExists("testing123"));
+    }
+
+    @Test
+    void testListObject(){
+        List<S3Object> result = _s3Client.ListObjects();
+        boolean found = false;
+        for(S3Object object : result){
+            if(object.key().equals("testing123")){
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+    }
+
+
+    @Test
+    void testDeleteObject(){
         // Delete object
+        _s3Client.DeleteObject("testing123");
+        assertFalse(_s3Client.DoesObjectExists("testing123"));
+        _s3Client.CreateObject("testing123", _base64Img);
+    }
+
+    @AfterEach
+    void afterEach(){
         _s3Client.DeleteObject("testing123");
     }
 
     @AfterAll
-    static void tearDown(){
+    static void afterAll(){
         _s3Client.Close();
     }
 }

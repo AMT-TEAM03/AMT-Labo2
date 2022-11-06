@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.List;
 
 import CloudProvider.AWS.AwsCloudClient;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class Main {
     public static void main(String[] args) throws IOException {
