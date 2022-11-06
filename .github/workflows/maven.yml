@@ -16,6 +16,9 @@ on:
 
 jobs:
   build:
+    environment: CI-AWS
+    env:
+      AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     runs-on: ubuntu-latest
 
     steps:
