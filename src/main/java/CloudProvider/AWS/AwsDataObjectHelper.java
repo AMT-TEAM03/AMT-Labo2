@@ -32,7 +32,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
-import software.amazon.awssdk.regions.Region;
 
 public class AwsDataObjectHelper implements IDataObject{
     private S3Client s3Client;
@@ -40,7 +39,6 @@ public class AwsDataObjectHelper implements IDataObject{
     public AwsDataObjectHelper(ProfileCredentialsProvider profile){
         s3Client = S3Client.builder()
                 .credentialsProvider(profile)
-                .region(Region.EU_WEST_2)
                 .build();
     }
 

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import CloudProvider.ILabelDetector;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsResponse;
@@ -21,7 +20,6 @@ public class AwsLabelDetectorHelper implements ILabelDetector {
     public AwsLabelDetectorHelper(ProfileCredentialsProvider profile){
         rekClient = RekognitionClient.builder()
         .credentialsProvider(profile)
-        .region(Region.EU_WEST_2)
         .build();
     }
 
