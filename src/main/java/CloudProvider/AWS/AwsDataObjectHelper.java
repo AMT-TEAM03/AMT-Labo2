@@ -1,5 +1,6 @@
 package CloudProvider.AWS;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -29,6 +31,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.waiters.S3Waiter;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.waiters.WaiterResponse;
 
@@ -40,7 +43,7 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
     }
 
-    public URL CreateObject(String objectKey, String base64Img){
+    public URL CreateObject(String objectKey, byte[] content){
         String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
         S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
         if(bucketUrl == null){
@@ -57,8 +60,7 @@ public class AwsDataObjectHelper implements IDataObject{
                     .bucket(bucketUrl)
                     .key(objectKey)
                     .build();
-            byte[] bImg = java.util.Base64.getDecoder().decode(base64Img);
-            PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(bImg));
+            PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(content));
             // Generate URL valid for 60 minutes
             // Create a GetObjectRequest to be pre-signed
             GetObjectRequest getObjectRequest =
@@ -87,7 +89,8 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public void DeleteObject(String objectKey){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        AwsCloudClient client = AwsCloudClient.getInstance();
+        String bucketUrl = client.GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -96,6 +99,27 @@ public class AwsDataObjectHelper implements IDataObject{
                         .key(objectKey)
                         .build();
         s3Client.deleteObject(delReq);
+        // Remove the label detection cache if exists 
+        if(client.DoesObjectExists(objectKey + "_result")){
+            delReq = DeleteObjectRequest.builder()
+                        .bucket(bucketUrl)
+                        .key(objectKey + "_result")
+                        .build();
+            s3Client.deleteObject(delReq);
+        }
+    }
+
+    public InputStream GetObject(String objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
+        GetObjectRequest request = GetObjectRequest.builder()
+                                    .bucket(bucketUrl)
+                                    .key(objectKey)
+                                    .build();
+        ResponseInputStream<GetObjectResponse> response = s3Client.getObject(request);
+        return response;
     }
 
     public List<S3Object> ListObjects(){

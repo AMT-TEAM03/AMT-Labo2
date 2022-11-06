@@ -1,5 +1,6 @@
 package CloudProvider.AWS;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +64,16 @@ public class AwsCloudClient implements ICloudClient {
         objectHelper.DeleteBucket(bucketName);
     }
 
-    public URL CreateObject(String objectName, String base64Img){
-        return objectHelper.CreateObject(objectName, base64Img);
+    public URL CreateObject(String objectKey, byte[] content){
+        return objectHelper.CreateObject(objectKey, content);
     }
 
     public void DeleteObject(String objectKey){
         objectHelper.DeleteObject(objectKey);
+    }
+
+    public InputStream GetObject(String objectKey){
+        return objectHelper.GetObject(objectKey);
     }
 
     public List<S3Object> ListObjects(){
@@ -79,7 +84,7 @@ public class AwsCloudClient implements ICloudClient {
         return objectHelper.DoesObjectExists(objectKey);
     }
 
-    public List<String> Execute(String imageUri, Map<String, Object> params){
+    public List<AwsPatternDetected> Execute(String imageUri, Map<String, Object> params){
         return labelHelper.Execute(imageUri, params);
     }
     
