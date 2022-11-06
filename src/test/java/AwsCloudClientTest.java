@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
@@ -17,7 +18,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
 import CloudProvider.AWS.AwsCloudClient;
+import CloudProvider.AWS.JSON.AwsLogEntry;
 import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -104,14 +111,35 @@ class AWSTest {
 
     @Test
     void testDetection(){
+        _awsClient.ResetLogging();
         List<AwsPatternDetected> result = _awsClient.Execute("testing123", null);
         assertTrue(_awsClient.DoesObjectExists("testing123_result"));
+        assertTrue(_awsClient.DoesObjectExists("logs"));
+        // Check Caching
         List<AwsPatternDetected> cachedResult = _awsClient.Execute("testing123", null);
         assertEquals(result.size(), cachedResult.size());
         for(int i = 0; i < result.size(); i++){
             assertEquals(result.get(i).name, cachedResult.get(i).name);
             assertEquals(result.get(i).confidence, cachedResult.get(i).confidence);
         }
+        // Check transaction logging
+        // Get logging content as string
+        InputStream logStream = _awsClient.GetObject("logs");
+        String logString = new BufferedReader(new InputStreamReader(logStream))
+            .lines().collect(Collectors.joining("\n"));
+        // JSonArray representing the cached result
+        Gson g = new Gson();
+        JsonArray cacheResult = JsonParser .parseString(logString).getAsJsonArray();
+        Type cacheType = new TypeToken<List<AwsLogEntry>>(){}.getType();
+        List<AwsLogEntry> logs = g.fromJson(cacheResult, cacheType);
+        boolean found = false;
+        for(AwsLogEntry log : logs){
+            if(log.fileTreatedKey.equals("testing123")){
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
     }
 
     @AfterEach
