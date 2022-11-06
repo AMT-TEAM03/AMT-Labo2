@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import CloudProvider.ILabelDetector;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsResponse;
@@ -17,9 +16,8 @@ import software.amazon.awssdk.services.rekognition.model.S3Object;
 public class AwsLabelDetectorHelper implements ILabelDetector {
     private RekognitionClient rekClient;
 
-    public AwsLabelDetectorHelper(ProfileCredentialsProvider profile){
+    public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder()
-        .credentialsProvider(profile)
         .build();
     }
 

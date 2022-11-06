@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import CloudProvider.IDataObject;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
@@ -36,9 +35,8 @@ import software.amazon.awssdk.core.waiters.WaiterResponse;
 public class AwsDataObjectHelper implements IDataObject{
     private S3Client s3Client;
 
-    public AwsDataObjectHelper(ProfileCredentialsProvider profile){
+    public AwsDataObjectHelper(){
         s3Client = S3Client.builder()
-                .credentialsProvider(profile)
                 .build();
     }
 
