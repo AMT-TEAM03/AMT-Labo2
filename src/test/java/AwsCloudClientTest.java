@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import CloudProvider.AWS.AwsCloudClient;
-import CloudProvider.AWS.AwsPatternDetected;
+import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 class AWSTest {

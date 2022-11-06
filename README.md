@@ -33,3 +33,37 @@ du projet.
 Les settings se trouvent [de cette manière](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where).
 Le fichier `config` permet de renseigner la région et le format des réponses.
 Le fichier `credentials` permet de renseigner ses identifiants AWS.
+
+## Caching for pattern detection
+The cache is stored in the same bucket as the treated image as an object with the name {imageKey}_result.
+
+It contains data under the form :
+```json
+[
+    {
+        "name": "Car",
+        "confidence": 98.438
+     },
+     ...
+]
+```
+
+The object of the array are instance of the AwsPatternDetected class for serialization/deserialization.
+
+## Transactions logging for billing
+The logs are stored in the current bucket as an object with the name "logs".
+
+It contains data under the form :.
+```json
+[
+    {
+        "fileTreatedKey": "ImageKey",
+        "duration": 1154 // In ms
+     },
+     ...
+]
+```
+
+The object of the array are instance of the AwsLogEntry class for serialization/deserialization.
+
+A ResetLogging() method has been implemented to clear the transaction logs.
