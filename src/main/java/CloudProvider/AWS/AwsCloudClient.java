@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import CloudProvider.ICloudClient;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
@@ -20,9 +19,8 @@ public class AwsCloudClient implements ICloudClient {
     private String bucketUrl;
 
     private AwsCloudClient(String bucketUrl){
-        ProfileCredentialsProvider profile = ProfileCredentialsProvider.create();
-        objectHelper = new AwsDataObjectHelper(profile);
-        labelHelper = new AwsLabelDetectorHelper(profile);
+        objectHelper = new AwsDataObjectHelper();
+        labelHelper = new AwsLabelDetectorHelper();
         this.presigner = S3Presigner.create();
         this.bucketUrl = bucketUrl;
     }
