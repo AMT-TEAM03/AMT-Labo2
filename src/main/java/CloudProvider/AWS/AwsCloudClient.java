@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import CloudProvider.ICloudClient;
+import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
@@ -38,6 +39,10 @@ public class AwsCloudClient implements ICloudClient {
             INSTANCE = new AwsCloudClient(bucketUrl);
         }
         return INSTANCE;
+    }
+
+    public void SetConfidenceThreshold(int confidence){
+        this.labelHelper.SetConfidenceThreshold(confidence);
     }
 
     public String GetBucketUrl(){
@@ -82,6 +87,10 @@ public class AwsCloudClient implements ICloudClient {
 
     public boolean DoesObjectExists(String objectKey){
         return objectHelper.DoesObjectExists(objectKey);
+    }
+
+    public void ResetLogging(){
+        this.objectHelper.DeleteObject("logs");
     }
 
     public List<AwsPatternDetected> Execute(String imageUri, Map<String, Object> params){

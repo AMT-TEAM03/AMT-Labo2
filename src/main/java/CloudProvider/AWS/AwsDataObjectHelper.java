@@ -24,7 +24,6 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -60,7 +59,7 @@ public class AwsDataObjectHelper implements IDataObject{
                     .bucket(bucketUrl)
                     .key(objectKey)
                     .build();
-            PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(content));
+            s3Client.putObject(putOb, RequestBody.fromBytes(content));
             // Generate URL valid for 60 minutes
             // Create a GetObjectRequest to be pre-signed
             GetObjectRequest getObjectRequest =

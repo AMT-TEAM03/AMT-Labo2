@@ -1,12 +1,16 @@
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import CloudProvider.AWS.AwsCloudClient;
-import CloudProvider.AWS.AwsPatternDetected;
+import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class Main {
@@ -59,5 +63,10 @@ public class Main {
         }
         // Delete image
         client.DeleteObject("coucou3");
+        // Display the transaction logs
+        System.out.println("Transactions for billing : ");
+        InputStream logStream = client.GetObject("logs");
+        System.out.println(new BufferedReader(new InputStreamReader(logStream))
+                        .lines().collect(Collectors.joining("\n")));
     }
 }

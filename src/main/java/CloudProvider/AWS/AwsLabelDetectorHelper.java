@@ -16,6 +16,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import CloudProvider.ILabelDetector;
+import CloudProvider.AWS.JSON.AwsLogEntry;
+import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
 import software.amazon.awssdk.services.rekognition.model.DetectLabelsResponse;
@@ -26,12 +28,25 @@ import software.amazon.awssdk.services.rekognition.model.S3Object;
 
 public class AwsLabelDetectorHelper implements ILabelDetector {
     private RekognitionClient rekClient;
-    private int CONFIDENCE_THRESHOLD = 90;
+    private int confidence_threshold = 90;
     private int MAX_PATTERN = 10;
 
     public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder()
         .build();
+    }
+
+    public void SetConfidenceThreshold(int confidence){
+        this.confidence_threshold = confidence;
+    }
+
+    public void ResetLogging(){
+        AwsCloudClient client = AwsCloudClient.getInstance();
+        String bucketUrl = client.GetBucketUrl();
+        if(bucketUrl == null){
+            throw new Error("Bucket URL not set...");
+        }
+        client.DeleteObject("logs");
     }
 
     public List<AwsPatternDetected> Execute(String imageKey, Map<String, Object> params){
@@ -74,10 +89,32 @@ public class AwsLabelDetectorHelper implements ILabelDetector {
                         .image(myImage)
                         .maxLabels(10)
                         .build();
-    
+                // Compute time for loggin
+                long startTime = System.currentTimeMillis();
                 DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
+                long endTime = System.currentTimeMillis();
+                long time = (endTime - startTime);
+                List<AwsLogEntry> logs;
+                if(client.DoesObjectExists("logs")){
+                    // Get logging content as string
+                    InputStream logStream = client.GetObject("logs");
+                    String logString = new BufferedReader(new InputStreamReader(logStream))
+                        .lines().collect(Collectors.joining("\n"));
+                    // JSonArray representing the cached result
+                    JsonArray cacheResult = JsonParser .parseString(logString).getAsJsonArray();
+                    Type cacheType = new TypeToken<List<AwsLogEntry>>(){}.getType();
+                    logs = g.fromJson(cacheResult, cacheType);
+                    // Remove old log file
+                    client.DeleteObject("logs");
+                }else{
+                    logs = new ArrayList<>();
+                }
+                logs.add(new AwsLogEntry(imageKey, time));
+                // Upload new log file
+                String jsonLogs = g.toJson(logs);
+                client.CreateObject("logs", jsonLogs.getBytes());
+                // Extract labels from response
                 labels = labelsResponse.labels();
-    
             } catch (RekognitionException e) {
                 e.printStackTrace();
                 System.out.println(e.getMessage());
@@ -86,7 +123,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector {
             // Serialize result and upload it
             int patternDetected = 0;
             for(Label label: labels){
-                if(label.confidence() >= CONFIDENCE_THRESHOLD){
+                if(label.confidence() >= confidence_threshold){
                     result.add(new AwsPatternDetected(label.name(), label.confidence()));
                     patternDetected++;
                     if(patternDetected > MAX_PATTERN){
