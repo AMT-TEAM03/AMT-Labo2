@@ -6,6 +6,7 @@ import java.util.Base64;
 import java.util.List;
 
 import CloudProvider.AWS.AwsCloudClient;
+import CloudProvider.AWS.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class Main {
@@ -34,14 +35,27 @@ public class Main {
         AwsCloudClient client = AwsCloudClient.getInstance();
         // Optional, default value is "amt.team03.diduno.education"
         client.SetBucketUrl("amt.team03.diduno.education");
+        // List all objects
+        System.out.println("List objects : ");
+        List<S3Object> objects = client.ListObjects();
+        for(S3Object object : objects){
+            System.out.println(object.key());
+        }
         // Create an object
-        URL url = client.CreateObject("coucou3", dataRow);
+        URL url = client.CreateObject("coucou3", java.util.Base64.getDecoder().decode(dataRow));
         System.out.println("New object accessible at " + url);
         // Detect pattern in image
-        List<String> labels = client.Execute("coucou3", null);
+        List<AwsPatternDetected> labels = client.Execute("coucou3", null);
         // List pattern detected
-        for (String res : labels) {
-            System.out.println(res);
+        System.out.println("Pattern detected : ");
+        for (AwsPatternDetected res : labels) {
+            System.out.println(res.name + " -> " + res.confidence);
+        }
+        labels = client.Execute("coucou3", null);
+        // List pattern detected
+        System.out.println("Pattern detected with cache : ");
+        for (AwsPatternDetected res : labels) {
+            System.out.println(res.name + " -> " + res.confidence);
         }
         // Delete image
         client.DeleteObject("coucou3");

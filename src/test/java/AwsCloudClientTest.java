@@ -1,11 +1,15 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -14,17 +18,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import CloudProvider.AWS.AwsCloudClient;
+import CloudProvider.AWS.AwsPatternDetected;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-class AwsCloudClientTest {
+class AWSTest {
 
-    static AwsCloudClient _s3Client;
+    static AwsCloudClient _awsClient;
     static String _base64Img;
 
     @BeforeAll
     static void beforeAll() throws IOException {
         // Instantiate singleton instance
-        _s3Client = AwsCloudClient.getInstance();
+        _awsClient = AwsCloudClient.getInstance();
         // Encode an image in a base64 like string
         // image path declaration
         String imgPath = "./src/main/resources/coucou.jpg";
@@ -47,26 +52,26 @@ class AwsCloudClientTest {
 
     @BeforeEach
     void beforeEach(){
-        _s3Client.CreateObject("testing123", _base64Img);
+        _awsClient.CreateObject("testing123", java.util.Base64.getDecoder().decode(_base64Img));
     }
 
     @Test
     void testCreateObject() {
-        URL url = _s3Client.CreateObject("testing1234", _base64Img);
+        URL url = _awsClient.CreateObject("testing1234", java.util.Base64.getDecoder().decode(_base64Img));
         assertNotNull(url);
         // Expect this one to fail as already exist
-        assertThrows(Error.class, () -> _s3Client.CreateObject("testing1234", _base64Img));
-        _s3Client.DeleteObject("testing1234");
+        assertThrows(Error.class, () -> _awsClient.CreateObject("testing1234", java.util.Base64.getDecoder().decode(_base64Img)));
+        _awsClient.DeleteObject("testing1234");
     }
 
     @Test 
     void testDoesObjectExists(){
-        assertTrue(_s3Client.DoesObjectExists("testing123"));
+        assertTrue(_awsClient.DoesObjectExists("testing123"));
     }
 
     @Test
     void testListObject(){
-        List<S3Object> result = _s3Client.ListObjects();
+        List<S3Object> result = _awsClient.ListObjects();
         boolean found = false;
         for(S3Object object : result){
             if(object.key().equals("testing123")){
@@ -77,244 +82,45 @@ class AwsCloudClientTest {
         assertTrue(found);
     }
 
+    @Test
+    void testGetObject() throws IOException{
+        String objectContent = "coucou tout le monde!";
+        _awsClient.CreateObject("testing12345", objectContent.getBytes());
+        InputStream objectStream = _awsClient.GetObject("testing12345");
+        _awsClient.DeleteObject("testing12345");
+        String result = new BufferedReader(new InputStreamReader(objectStream))
+            .lines().collect(Collectors.joining("\n"));
+        objectStream.close();
+        assertEquals(objectContent, new String(result));
+    }
 
     @Test
     void testDeleteObject(){
         // Delete object
-        _s3Client.DeleteObject("testing123");
-        assertFalse(_s3Client.DoesObjectExists("testing123"));
-        _s3Client.CreateObject("testing123", _base64Img);
+        _awsClient.DeleteObject("testing123");
+        assertFalse(_awsClient.DoesObjectExists("testing123"));
+        _awsClient.CreateObject("testing123", java.util.Base64.getDecoder().decode(_base64Img));
+    }
+
+    @Test
+    void testDetection(){
+        List<AwsPatternDetected> result = _awsClient.Execute("testing123", null);
+        assertTrue(_awsClient.DoesObjectExists("testing123_result"));
+        List<AwsPatternDetected> cachedResult = _awsClient.Execute("testing123", null);
+        assertEquals(result.size(), cachedResult.size());
+        for(int i = 0; i < result.size(); i++){
+            assertEquals(result.get(i).name, cachedResult.get(i).name);
+            assertEquals(result.get(i).confidence, cachedResult.get(i).confidence);
+        }
     }
 
     @AfterEach
     void afterEach(){
-        _s3Client.DeleteObject("testing123");
+        _awsClient.DeleteObject("testing123");
     }
 
     @AfterAll
-    static void afterAll(){
-        _s3Client.Close();
+    static void tearDown(){
+        _awsClient.Close();
     }
 }
-
-
-// using System.IO;using System.Threading.Tasks;using NUnit.Framework;using Ria2ApiEvaluationModel.BucketManager;
-
-// namespace TestRiaApiEvaluationModel{
-
-// public class TestAwsBucketManagerImpl {
-
-//     #region private attributes
-//     private AwsBucketManagerImpl bucketManager;
-//     private string domain;
-//     private string bucketName;
-//     private string bucketUrl;
-//     private string imageName;
-//     private string pathToTestFolder;
-//     private string fullPathToImage;
-//     private string prefixObjectDownloaded;#endregion
-
-//     private attributes
-
-//         [SetUp]
-//         public void Init()
-//         {
-//             this.pathToTestFolder = Directory.GetCurrentDirectory().Replace("bin\\Debug\\netcoreapp3.1", "testData");
-//             this.bucketName = "testbucket";
-//             this.domain = "aws.dev.actualit.info";
-//             this.bucketUrl = bucketName + "." + this.domain;
-//             this.imageName = "emiratesa380.jpg";
-//             this.fullPathToImage = pathToTestFolder + "\\" + imageName;
-//             this.prefixObjectDownloaded = "downloaded";
-//             this.bucketManager = new AwsBucketManagerImpl(this.bucketUrl);
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     CreateObject_CreateNewBucket_Success()
-//         {
-//             //given
-//             Assert.IsFalse(await this.bucketManager.Exists(bucketUrl));
-
-//             //when
-//             await this.bucketManager.CreateObject(bucketUrl);
-
-//             //then
-//             Assert.IsTrue(await this.bucketManager.Exists(bucketUrl));
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     CreateObject_CreateObjectWithExistingBucket_Success()
-//         {
-//             //given
-//             string fileName = this.imageName;
-//             string objectUrl = this.bucketUrl + "/" + this.imageName;
-//             await this.bucketManager.CreateObject(this.bucketUrl);
-//             Assert.IsTrue(await this.bucketManager.Exists(this.bucketUrl));
-//             Assert.IsFalse(await this.bucketManager.Exists(objectUrl));
-
-//             //when
-//             await this.bucketManager.CreateObject(objectUrl, this.pathToTestFolder + "//" + fileName);
-
-//             //then
-//             Assert.IsTrue(await this.bucketManager.Exists(objectUrl));
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     CreateObject_CreateObjectBucketNotExist_Success()
-//         {
-//             //given
-//             string fileName = this.imageName;
-//             string objectUrl = this.bucketUrl + "/" + this.imageName;
-//             Assert.IsFalse(await this.bucketManager.Exists(this.bucketUrl));
-//             Assert.IsFalse(await this.bucketManager.Exists(objectUrl));
-
-//             //when
-//             await this.bucketManager.CreateObject(objectUrl, this.pathToTestFolder + "//" + fileName);
-
-//             //then
-//             Assert.IsTrue(await this.bucketManager.Exists(objectUrl));
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     DownloadObject_NominalCase_Success()
-//         {
-//             //given
-//             string objectUrl = bucketUrl + "//" + this.imageName;
-//             string destinationFullPath = this.pathToTestFolder + "//" + this.prefixObjectDownloaded + this.imageName;
-//             await this.bucketManager.CreateObject(objectUrl, this.pathToTestFolder + "//" + this.imageName);
-
-//             Assert.IsTrue(await this.bucketManager.Exists(bucketUrl));
-
-//             //when
-//             await this.bucketManager.DownloadObject(objectUrl, destinationFullPath);
-            
-//             //then
-//             Assert.IsTrue(File.Exists(destinationFullPath));
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     Exists_NominalCase_Success()
-//         {
-//             //given
-//             Task t = this.bucketManager.CreateObject(this.bucketUrl);
-//             await t;
-//             bool actualResult;
-
-//             //when
-//             actualResult = await this.bucketManager.Exists(bucketUrl);
-
-//             //then
-//             Assert.IsTrue(actualResult);
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     Exists_ObjectNotExistBucket_Success()
-//         {
-//             //given
-//             string notExistingBucket = "notExistingBucket" + this.domain;
-//             bool actualResult;
-
-//             //when
-//             actualResult = await this.bucketManager.Exists(notExistingBucket);
-
-//             //then
-//             Assert.IsFalse(actualResult);
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     Exists_ObjectNotExistFile_Success()
-//         {
-//             //given
-//             await this.bucketManager.CreateObject(this.bucketUrl);
-//             string notExistingFile = bucketUrl + "//" + "notExistingFile.jpg";
-//             Assert.IsTrue(await this.bucketManager.Exists(bucketUrl));
-//             bool actualResult;
-
-//             //when
-//             actualResult = await this.bucketManager.Exists(notExistingFile);
-
-//             //then
-//             Assert.IsFalse(actualResult);
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     RemoveObject_EmptyBucket_Success()
-//         {
-//             //given
-//             await this.bucketManager.CreateObject(this.bucketUrl);
-//             Assert.IsTrue(await this.bucketManager.Exists(bucketUrl));
-
-//             //when
-//             await this.bucketManager.RemoveObject(this.bucketUrl);
-
-//             //then
-//             Assert.IsFalse(await this.bucketManager.Exists(bucketUrl));
-//         }
-
-//     [Test]
-
-//     public async Task
-
-//     RemoveObject_NotEmptyBucket_Success()
-//         {
-//             //given
-//             string fileName = this.imageName;
-//             string objectUrl = this.bucketUrl + "/" + this.imageName;
-//             await this.bucketManager.CreateObject(this.bucketUrl);
-//             await this.bucketManager.CreateObject(objectUrl, this.pathToTestFolder + "//" + fileName);
-
-//             Assert.IsTrue(await this.bucketManager.Exists(bucketUrl));
-//             Assert.IsTrue(await this.bucketManager.Exists(objectUrl));
-
-//             //when
-//             await this.bucketManager.RemoveObject(this.bucketUrl);
-
-//             //then
-//             Assert.IsFalse(await this.bucketManager.Exists(bucketUrl));
-//         }
-
-//     [TearDown]
-
-//     public async Task
-
-//     Cleanup()
-//         {
-//             string destinationFullPath = this.pathToTestFolder + "\\" + this.prefixObjectDownloaded + this.imageName;
-
-//             if (File.Exists(destinationFullPath))
-//             {
-//                 File.Delete(destinationFullPath);
-//             }
-
-//             this.bucketManager = new AwsBucketManagerImpl(this.bucketUrl);
-//             if (await this.bucketManager.Exists(bucketUrl))
-//             {
-//                 await this.bucketManager.RemoveObject(this.bucketUrl);
-//             }
-//         }
-// }
-// }
