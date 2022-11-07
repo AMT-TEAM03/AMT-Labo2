@@ -18,6 +18,44 @@ Le projet utilise les fichiers d'identification et de settings d'AWS. [Ce lien](
 Si les fichiers n'existent pas, le [CLI d'AWS](https://aws.amazon.com/cli/) permet de les créer à l'aide de la commande `aws configure`. Il est également possible
 de créer soit-même ses identifiants et ses configuration en respectant l'exemple de configuration du lien précédent et l'[AWS Credentials File Format](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html#credentials-file-format)
 
+
+## Mise en cache pour la détection de patterne
+Le cache est stocké dans le même bucket que l'image traitée en tant qu'objet, avec le nom {imageKey}_result.
+
+Les data sont stockées sous la forme suivante:
+```json
+[
+    {
+        "name": "Car",
+        "confidence": 98.438
+     },
+     ...
+]
+```
+
+Les objets de la table sont des instances de la classe AwsPatternDetected pour la sérialisation/déserialisation.
+
+## Stockage des logs de transaction pour de futur paiements
+
+Les logs sont stockées dans le bucket actuel en tant qu'objet avec le nom "logs".
+
+Les informations sont stockées sous la forme suivante:
+
+```json
+[
+    {
+        "fileTreatedKey": "ImageKey",
+        "duration": 1154 // In ms
+     },
+     ...
+]
+```  
+
+Les objets de la table sont des instances de la classe AwsLogEntry pour la sérialisation/déserialisation.
+
+Une méthode ResetLogging() a été implémentée pour supprimmer les logs de transaction.
+
+
 ### Test et compilation
 
 Les tests sont fait avec JUnit, et lancé avec maven grâce à la commande  
@@ -34,36 +72,4 @@ Les settings se trouvent [de cette manière](https://docs.aws.amazon.com/cli/lat
 Le fichier `config` permet de renseigner la région et le format des réponses.
 Le fichier `credentials` permet de renseigner ses identifiants AWS.
 
-## Caching for pattern detection
-The cache is stored in the same bucket as the treated image as an object with the name {imageKey}_result.
 
-It contains data under the form :
-```json
-[
-    {
-        "name": "Car",
-        "confidence": 98.438
-     },
-     ...
-]
-```
-
-The object of the array are instance of the AwsPatternDetected class for serialization/deserialization.
-
-## Transactions logging for billing
-The logs are stored in the current bucket as an object with the name "logs".
-
-It contains data under the form :.
-```json
-[
-    {
-        "fileTreatedKey": "ImageKey",
-        "duration": 1154 // In ms
-     },
-     ...
-]
-```
-
-The object of the array are instance of the AwsLogEntry class for serialization/deserialization.
-
-A ResetLogging() method has been implemented to clear the transaction logs.
