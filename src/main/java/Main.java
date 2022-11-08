@@ -38,34 +38,57 @@ public class Main {
         // Test AwsCloudClient
         // Get Client instance
         AwsCloudClient client = AwsCloudClient.getInstance();
+
         // Optional, default value is "amt.team03.diduno.education"
         client.SetBucketUrl("amt.team03.diduno.education");
+
         // List all objects
-        System.out.println("List objects : ");
+        System.out.println("\n\nList objects : ");
         List<S3Object> objects = client.ListObjects();
         for(S3Object object : objects){
             System.out.println(object.key());
         }
+
         // Create an object
         URL url = client.CreateObject(imgKey, java.util.Base64.getDecoder().decode(dataRow));
-        System.out.println("New object accessible at " + url);
+
+        // List all objects after creating object
+        System.out.println("\n\nList objects after creation : ");
+        List<S3Object> objectsAfterCreate = client.ListObjects();
+        for(S3Object object : objectsAfterCreate){
+            System.out.println(object.key());
+        }
+
+        System.out.println("\n\nNew object accessible at " + url);
+
         // Detect pattern in image
         List<AwsPatternDetected> labels = client.Execute(imgKey, null);
+
         // List pattern detected
-        System.out.println("Pattern detected : ");
+        System.out.println("\n\nPattern detected : ");
         for (AwsPatternDetected res : labels) {
             System.out.println(res.name + " -> " + res.confidence);
         }
         labels = client.Execute(imgKey, null);
+
         // List pattern detected
-        System.out.println("Pattern detected with cache : ");
+        System.out.println("\n\nPattern detected with cache : ");
         for (AwsPatternDetected res : labels) {
             System.out.println(res.name + " -> " + res.confidence);
         }
+
         // Delete image
         client.DeleteObject(imgKey);
+
+        // List all objects after deleting object
+        System.out.println("\n\nList objects after deletion : ");
+        List<S3Object> objectsAfterDelete = client.ListObjects();
+        for(S3Object object : objectsAfterDelete){
+            System.out.println(object.key());
+        }
+
         // Display the transaction logs
-        System.out.println("Transactions for billing : ");
+        System.out.println("\n\nTransactions for billing : ");
         InputStream logStream = client.GetObject("logs");
         System.out.println(new BufferedReader(new InputStreamReader(logStream))
                         .lines().collect(Collectors.joining("\n")));
