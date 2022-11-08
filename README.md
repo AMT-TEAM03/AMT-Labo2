@@ -10,7 +10,7 @@ Il se lance tel qu'expliqué dans la section [Usage](#usage). De plus, une image
 de pouvoir tester le programme
 
 ## Débuter sur le projet
-### Instalation de maven
+### Installation de maven
 Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
 
 Une fois maven installé, il faut installer les dépendances avec la commande :  
