@@ -26,7 +26,7 @@ import software.amazon.awssdk.services.rekognition.model.Label;
 import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 import software.amazon.awssdk.services.rekognition.model.S3Object;
 
-public class AwsLabelDetectorHelper implements ILabelDetector {
+public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
     private RekognitionClient rekClient;
     private int confidence_threshold = 90;
     private int MAX_PATTERN = 10;
