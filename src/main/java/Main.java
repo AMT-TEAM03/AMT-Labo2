@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // Encode an image in a base64 like string
         // image path declaration
-        String imgPath = "./src/main/resources/coucou.jpg";
+        String imgPath = args[0];
         // read image from file
         FileInputStream stream = new FileInputStream(imgPath);
         // get byte array from image stream
