@@ -19,7 +19,7 @@ Si les fichiers n'existent pas, le [CLI d'AWS](https://aws.amazon.com/cli/) perm
 de créer soit-même ses identifiants et ses configuration en respectant l'exemple de configuration du lien précédent et l'[AWS Credentials File Format](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html#credentials-file-format)
 
 
-## Mise en cache pour la détection de patterne
+### Mise en cache pour la détection de patterne
 Le cache est stocké dans le même bucket que l'image traitée en tant qu'objet, avec le nom {imageKey}_result.
 
 Les data sont stockées sous la forme suivante:
@@ -33,9 +33,9 @@ Les data sont stockées sous la forme suivante:
 ]
 ```
 
-Les objets de la table sont des instances de la classe AwsPatternDetected pour la sérialisation/déserialisation.
+Les objets du tableau sont des instances de la classe AwsPatternDetected pour la sérialisation/déserialisation.
 
-## Stockage des logs de transaction pour de futur paiements
+### Stockage des logs de transaction pour de futur paiements
 
 Les logs sont stockées dans le bucket actuel en tant qu'objet avec le nom "logs".
 
@@ -51,7 +51,7 @@ Les informations sont stockées sous la forme suivante:
 ]
 ```  
 
-Les objets de la table sont des instances de la classe AwsLogEntry pour la sérialisation/déserialisation.
+Les objets du tableau sont des instances de la classe AwsLogEntry pour la sérialisation/déserialisation.
 
 Une méthode ResetLogging() a été implémentée pour supprimmer les logs de transaction.
 
@@ -59,17 +59,22 @@ Une méthode ResetLogging() a été implémentée pour supprimmer les logs de tr
 ### Test et compilation
 
 Les tests sont fait avec JUnit, et lancé avec maven grâce à la commande  
-```mvn test```
+```mvn test```  
+Pour la CI de github, nous utilisons des variables d'environnements tirées des githubs secrets afin de ne pas avoir 
+besoin d'upload des fichiers contenants des informations sensibles.
+
+Les test utilise des variables d'environnement au lieu d'un profile AWS afin que les tests puissent être effectués 
+par github.
 
 Compiler le projet  
 ```mvn package```  
-Si la compilation s'est effectuée avec succès, le fichier jar résultant est trouvable dans le dossier target à la racine
-du projet.
-
+Si la compilation s'est effectuée avec succès, on doit trouver 2 fichier jar dans le dossier target. un dossier ayant
+pour nom `<nomDuProjet>.jar` et `original-<nomDuProjet>.jar`. Il faut run le fichier sans l'extension `original-`.
 
 ## Changer les settings
 Les settings se trouvent [de cette manière](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where).
 Le fichier `config` permet de renseigner la région et le format des réponses.
 Le fichier `credentials` permet de renseigner ses identifiants AWS.
 
-
+Par défaut, nous utilisons le bucket qui nous a été fournis par le professeur. Il est possible de changer le bucket sur 
+lequel nous taravaillons avec la méthode SetBucket.  
