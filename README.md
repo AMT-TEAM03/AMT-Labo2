@@ -3,8 +3,14 @@
 - Melly Jérémie  
 - Seem Thibault
 
+
+## Livrable sur la machine linux
+Notre livrable est un fichier nommé `AMT2-DataObject-1.0-SNAPSHOT.jar`, situé dans le répertoire `/opt/AMT-Labo2`.  
+Il se lance tel qu'expliqué dans la section [Usage](#usage). De plus, une image est présente dans le répoertoire afin 
+de pouvoir tester le programme
+
 ## Débuter sur le projet
-### Instalation de maven
+### Installation de maven
 Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
 
 Une fois maven installé, il faut installer les dépendances avec la commande :  
@@ -18,26 +24,11 @@ Le projet utilise les fichiers d'identification et de settings d'AWS. [Ce lien](
 Si les fichiers n'existent pas, le [CLI d'AWS](https://aws.amazon.com/cli/) permet de les créer à l'aide de la commande `aws configure`. Il est également possible
 de créer soit-même ses identifiants et ses configuration en respectant l'exemple de configuration du lien précédent et l'[AWS Credentials File Format](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html#credentials-file-format)
 
-### Test et compilation
 
-Les tests sont fait avec JUnit, et lancé avec maven grâce à la commande  
-```mvn test```
+### Mise en cache pour la détection de patterne
+Le cache est stocké dans le même bucket que l'image traitée en tant qu'objet, avec le nom {imageKey}_result.
 
-Compiler le projet  
-```mvn package```  
-Si la compilation s'est effectuée avec succès, le fichier jar résultant est trouvable dans le dossier target à la racine
-du projet.
-
-
-## Changer les settings
-Les settings se trouvent [de cette manière](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where).
-Le fichier `config` permet de renseigner la région et le format des réponses.
-Le fichier `credentials` permet de renseigner ses identifiants AWS.
-
-## Caching for pattern detection
-The cache is stored in the same bucket as the treated image as an object with the name {imageKey}_result.
-
-It contains data under the form :
+Les data sont stockées sous la forme suivante:
 ```json
 [
     {
@@ -48,12 +39,14 @@ It contains data under the form :
 ]
 ```
 
-The object of the array are instance of the AwsPatternDetected class for serialization/deserialization.
+Les objets du tableau sont des instances de la classe AwsPatternDetected pour la sérialisation/déserialisation.
 
-## Transactions logging for billing
-The logs are stored in the current bucket as an object with the name "logs".
+### Stockage des logs de transaction pour de futur paiements
 
-It contains data under the form :.
+Les logs sont stockées dans le bucket actuel en tant qu'objet avec le nom "logs".
+
+Les informations sont stockées sous la forme suivante:
+
 ```json
 [
     {
@@ -62,8 +55,46 @@ It contains data under the form :.
      },
      ...
 ]
-```
+```  
 
-The object of the array are instance of the AwsLogEntry class for serialization/deserialization.
+Les objets du tableau sont des instances de la classe AwsLogEntry pour la sérialisation/déserialisation.
 
-A ResetLogging() method has been implemented to clear the transaction logs.
+Une méthode ResetLogging() a été implémentée pour supprimmer les logs de transaction.
+
+
+### Test et compilation
+
+Les tests sont fait avec JUnit, et lancé avec maven grâce à la commande  
+```mvn test```  
+Pour la CI de github, nous utilisons des variables d'environnements tirées des githubs secrets afin de ne pas avoir 
+besoin d'upload des fichiers contenants des informations sensibles.
+
+Les test utilise des variables d'environnement au lieu d'un profile AWS afin que les tests puissent être effectués 
+par github.
+
+Compiler le projet  
+```mvn package```  
+Si la compilation s'est effectuée avec succès, on doit trouver 2 fichier jar dans le dossier target. un dossier ayant
+pour nom `<nomDuProjet>.jar` et `original-<nomDuProjet>.jar`. Il faut run le fichier sans l'extension `original-`.
+
+## Changer les settings
+Les settings se trouvent [de cette manière](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where).
+Le fichier `config` permet de renseigner la région et le format des réponses.
+Le fichier `credentials` permet de renseigner ses identifiants AWS.
+
+Par défaut, nous utilisons le bucket qui nous a été fournis par le professeur. Il est possible de changer le bucket sur 
+lequel nous taravaillons avec la méthode SetBucket.  
+
+
+## Usage
+Pour utiliser le projet, il faut run la commande  
+```java -jar AMT2-DataObject-1.0-SNAPSHOT.jar <image path> <image key for AWS>```  
+depuis le dossier ou se trouve le jar. Le chemin vers l'image peut être un chemin relatif ou absolu.  
+On reçoit alors une série d'informations:
+- La liste des objets présents dans le bucket
+- Un lien URL permettant d'accéder à l'objet depuis l'extérieur
+- La liste des objets présents dans le bucket après création d'un nouvel objet
+- Une liste des patterns détecté
+- La liste des objets présents dans le bucket après destruction d'un nouvel objet.
+- Un affichage des logs de toutes les actions effectuée sur ce bucket depuis le dernier reset.
+
