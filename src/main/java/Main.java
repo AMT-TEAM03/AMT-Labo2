@@ -18,6 +18,7 @@ public class Main {
         // Encode an image in a base64 like string
         // image path declaration
         String imgPath = args[0];
+        String imgKey = args[1];
         // read image from file
         FileInputStream stream = new FileInputStream(imgPath);
         // get byte array from image stream
@@ -46,23 +47,23 @@ public class Main {
             System.out.println(object.key());
         }
         // Create an object
-        URL url = client.CreateObject("coucou3", java.util.Base64.getDecoder().decode(dataRow));
+        URL url = client.CreateObject(imgKey, java.util.Base64.getDecoder().decode(dataRow));
         System.out.println("New object accessible at " + url);
         // Detect pattern in image
-        List<AwsPatternDetected> labels = client.Execute("coucou3", null);
+        List<AwsPatternDetected> labels = client.Execute(imgKey, null);
         // List pattern detected
         System.out.println("Pattern detected : ");
         for (AwsPatternDetected res : labels) {
             System.out.println(res.name + " -> " + res.confidence);
         }
-        labels = client.Execute("coucou3", null);
+        labels = client.Execute(imgKey, null);
         // List pattern detected
         System.out.println("Pattern detected with cache : ");
         for (AwsPatternDetected res : labels) {
             System.out.println(res.name + " -> " + res.confidence);
         }
         // Delete image
-        client.DeleteObject("coucou3");
+        client.DeleteObject(imgKey);
         // Display the transaction logs
         System.out.println("Transactions for billing : ");
         InputStream logStream = client.GetObject("logs");
