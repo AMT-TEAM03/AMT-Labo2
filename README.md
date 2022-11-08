@@ -3,6 +3,11 @@
 - Melly Jérémie  
 - Seem Thibault
 
+
+## Livrable sur la machine linux
+Notre livrable est un fichier nommé `AMT2-DataObject-1.0-SNAPSHOT.jar`, situé sous le répertoire `/opt/AMT-Labo2`.  
+Il se lance tel qu'expliqué dans la section [Usage](#usage)
+
 ## Débuter sur le projet
 ### Instalation de maven
 Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
@@ -91,3 +96,4 @@ On reçoit alors une série d'informations:
 - Une liste des patterns détecté
 - La liste des objets présents dans le bucket après destruction d'un nouvel objet.
 - Un affichage des logs de toutes les actions effectuée sur ce bucket depuis le dernier reset.
+
