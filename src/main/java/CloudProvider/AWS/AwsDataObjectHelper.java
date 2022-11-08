@@ -44,12 +44,8 @@ public class AwsDataObjectHelper implements IDataObject{
 
     public URL CreateObject(String objectKey, byte[] content){
         String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
-        S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
-        }
-        if(presigner == null){
-            throw new Error("No Presigner to generate URL...");
         }
         if(DoesObjectExists(objectKey)){
             throw new Error("File already exists in the bucket...");
@@ -60,31 +56,40 @@ public class AwsDataObjectHelper implements IDataObject{
                     .key(objectKey)
                     .build();
             s3Client.putObject(putOb, RequestBody.fromBytes(content));
-            // Generate URL valid for 60 minutes
-            // Create a GetObjectRequest to be pre-signed
-            GetObjectRequest getObjectRequest =
-                    GetObjectRequest.builder()
-                                    .bucket(bucketUrl)
-                                    .key(objectKey)
-                                    .build();
-
-            // Create a GetObjectPresignRequest to specify the signature duration
-            GetObjectPresignRequest getObjectPresignRequest =
-                GetObjectPresignRequest.builder()
-                                        .signatureDuration(Duration.ofMinutes(60))
-                                        .getObjectRequest(getObjectRequest)
-                                        .build();
-
-            // Generate the presigned request
-            PresignedGetObjectRequest presignedGetObjectRequest =
-                presigner.presignGetObject(getObjectPresignRequest);
-        
-            // Log the presigned URL, for example.
-            return presignedGetObjectRequest.url();
+            // Generate URL valid for 60 minutes            
+            return GetUrl(objectKey);
         } catch (S3Exception e) {
             System.err.println(e.getMessage());
             return null;
         }
+    }
+    
+    public URL GetUrl(String objectKey){
+        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
+        if (bucketUrl == null) {
+            throw new Error("Bucket URL not set...");
+        }
+        if (presigner == null) {
+            throw new Error("No Presigner to generate URL...");
+        }
+        // Generate URL valid for 60 minutes
+        // Create a GetObjectRequest to be pre-signed
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketUrl)
+                .key(objectKey)
+                .build();
+        // Create a GetObjectPresignRequest to specify the signature duration
+        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(60))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        // Generate the presigned request
+        PresignedGetObjectRequest presignedGetObjectRequest = presigner.presignGetObject(getObjectPresignRequest);
+
+        // Log the presigned URL, for example.
+        return presignedGetObjectRequest.url();
     }
 
     public void DeleteObject(String objectKey){
