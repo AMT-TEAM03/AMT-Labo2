@@ -5,8 +5,9 @@
 
 
 ## Livrable sur la machine linux
-Notre livrable est un fichier nommé `AMT2-DataObject-1.0-SNAPSHOT.jar`, situé sous le répertoire `/opt/AMT-Labo2`.  
-Il se lance tel qu'expliqué dans la section [Usage](#usage)
+Notre livrable est un fichier nommé `AMT2-DataObject-1.0-SNAPSHOT.jar`, situé dans le répertoire `/opt/AMT-Labo2`.  
+Il se lance tel qu'expliqué dans la section [Usage](#usage). De plus, une image est présente dans le répoertoire afin 
+de pouvoir tester le programme
 
 ## Débuter sur le projet
 ### Instalation de maven
