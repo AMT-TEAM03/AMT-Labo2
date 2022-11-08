@@ -18,6 +18,7 @@ public class Main {
         // Encode an image in a base64 like string
         // image path declaration
         String imgPath = args[0];
+        String imgKey = args[1];
         // read image from file
         FileInputStream stream = new FileInputStream(imgPath);
         // get byte array from image stream
@@ -49,9 +50,9 @@ public class Main {
         }
 
         // Create an object
-        URL url = client.CreateObject("coucou3", java.util.Base64.getDecoder().decode(dataRow));
+        URL url = client.CreateObject(imgKey, java.util.Base64.getDecoder().decode(dataRow));
 
-        // List all objects after creating object coucou3
+        // List all objects after creating object
         System.out.println("\n\nList objects after creation : ");
         List<S3Object> objectsAfterCreate = client.ListObjects();
         for(S3Object object : objectsAfterCreate){
@@ -61,14 +62,14 @@ public class Main {
         System.out.println("\n\nNew object accessible at " + url);
 
         // Detect pattern in image
-        List<AwsPatternDetected> labels = client.Execute("coucou3", null);
+        List<AwsPatternDetected> labels = client.Execute(imgKey, null);
 
         // List pattern detected
         System.out.println("\n\nPattern detected : ");
         for (AwsPatternDetected res : labels) {
             System.out.println(res.name + " -> " + res.confidence);
         }
-        labels = client.Execute("coucou3", null);
+        labels = client.Execute(imgKey, null);
 
         // List pattern detected
         System.out.println("\n\nPattern detected with cache : ");
@@ -77,9 +78,9 @@ public class Main {
         }
 
         // Delete image
-        client.DeleteObject("coucou3");
+        client.DeleteObject(imgKey);
 
-        // List all objects after deleting object coucou3
+        // List all objects after deleting object
         System.out.println("\n\nList objects after deletion : ");
         List<S3Object> objectsAfterDelete = client.ListObjects();
         for(S3Object object : objectsAfterDelete){

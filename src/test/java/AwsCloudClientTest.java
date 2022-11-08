@@ -77,7 +77,7 @@ class AWSTest {
     }
 
     @Test
-    void testListObject(){
+    void testListObjects(){
         List<S3Object> result = _awsClient.ListObjects();
         boolean found = false;
         for(S3Object object : result){
