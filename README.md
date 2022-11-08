@@ -78,3 +78,16 @@ Le fichier `credentials` permet de renseigner ses identifiants AWS.
 
 Par défaut, nous utilisons le bucket qui nous a été fournis par le professeur. Il est possible de changer le bucket sur 
 lequel nous taravaillons avec la méthode SetBucket.  
+
+
+## Usage
+Pour utiliser le projet, il faut run la commande  
+```java -jar AMT2-DataObject-1.0-SNAPSHOT.jar <image path>```  
+depuis le dossier ou se trouve le jar. Le chemin vers l'image peut être un chemin relatif ou absolu.  
+On reçoit alors une série d'informations:
+- La liste des objets présents dans le bucket
+- Un lien URL permettant d'accéder à l'objet depuis l'extérieur
+- La liste des objets présents dans le bucket après création d'un nouvel objet
+- Une liste des patterns détecté
+- La liste des objets présents dans le bucket après destruction d'un nouvel objet.
+- Un affichage des logs de toutes les actions effectuée sur ce bucket depuis le dernier reset.
