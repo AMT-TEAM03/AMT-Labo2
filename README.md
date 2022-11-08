@@ -82,7 +82,7 @@ lequel nous taravaillons avec la méthode SetBucket.
 
 ## Usage
 Pour utiliser le projet, il faut run la commande  
-```java -jar AMT2-DataObject-1.0-SNAPSHOT.jar <image path>```  
+```java -jar AMT2-DataObject-1.0-SNAPSHOT.jar <image path> <image key for AWS>```  
 depuis le dossier ou se trouve le jar. Le chemin vers l'image peut être un chemin relatif ou absolu.  
 On reçoit alors une série d'informations:
 - La liste des objets présents dans le bucket
