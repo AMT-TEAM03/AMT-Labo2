@@ -18,6 +18,8 @@ public class Main {
         // image path declaration
         String imgPath = args[0];
         String imgKey = args[1];
+        // String imgPath = "./src/main/resources/coucou.jpg";
+        // String imgKey = "coucoucoucoucou";
         // read image from file
         FileInputStream stream = new FileInputStream(imgPath);
         // get byte array from image stream
