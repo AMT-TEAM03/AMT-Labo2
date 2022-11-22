@@ -26,8 +26,9 @@ import com.google.gson.reflect.TypeToken;
 import CloudProvider.AWS.AwsCloudClient;
 import CloudProvider.AWS.JSON.AwsLogEntry;
 import CloudProvider.AWS.JSON.AwsPatternDetected;
-//TODO REVIEW this test class shouldn't have any reference to aws sdk
-import software.amazon.awssdk.services.s3.model.S3Object;
+//TODOR REVIEW this test class shouldn't have any reference to aws sdk
+// RES Removed import and convert list<S3Object> in List<String>
+// import software.amazon.awssdk.services.s3.model.S3Object;
 
 //TODO REVIEW split this test class to get a test class for the bucket, and an another one for labeldetection
 //TODO REVIEW refactor the whole class in BDD style !
@@ -87,10 +88,10 @@ class AWSTest {
 
     @Test
     void testListObjects() {
-        List<S3Object> result = _awsClient.ListObjects();
+        List<String> result = _awsClient.ListObjects();
         boolean found = false;
-        for (S3Object object : result) {
-            if (object.key().equals("testing123")) {
+        for (String object : result) {
+            if (object.equals("testing123")) {
                 found = true;
                 break;
             }
@@ -153,9 +154,12 @@ class AWSTest {
     }
 
     @AfterEach
-    //TODO REVIEW To avoid exception (self generated ;) test before deleting
+    //TODOR REVIEW To avoid exception (self generated ;) test before deleting
+    // RES > Check if object exist before deleting
     void afterEach(){
-        _awsClient.DeleteObject("testing123");
+        if(_awsClient.DoesObjectExists("testing123")){
+            _awsClient.DeleteObject("testing123");
+        }
     }
 
     @AfterAll

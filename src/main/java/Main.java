@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import CloudProvider.AWS.AwsCloudClient;
 import CloudProvider.AWS.JSON.AwsPatternDetected;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -44,9 +43,9 @@ public class Main {
 
         // List all objects
         System.out.println("\n\nList objects : ");
-        List<S3Object> objects = client.ListObjects();
-        for(S3Object object : objects){
-            System.out.println(object.key());
+        List<String> objects = client.ListObjects();
+        for(String object : objects){
+            System.out.println(object);
         }
 
         // Create an object
@@ -54,9 +53,9 @@ public class Main {
 
         // List all objects after creating object
         System.out.println("\n\nList objects after creation : ");
-        List<S3Object> objectsAfterCreate = client.ListObjects();
-        for(S3Object object : objectsAfterCreate){
-            System.out.println(object.key());
+        List<String> objectsAfterCreate = client.ListObjects();
+        for(String object : objectsAfterCreate){
+            System.out.println(object);
         }
 
         System.out.println("\n\nNew object accessible at " + url);
@@ -82,9 +81,9 @@ public class Main {
 
         // List all objects after deleting object
         System.out.println("\n\nList objects after deletion : ");
-        List<S3Object> objectsAfterDelete = client.ListObjects();
-        for(S3Object object : objectsAfterDelete){
-            System.out.println(object.key());
+        List<String> objectsAfterDelete = client.ListObjects();
+        for(String object : objectsAfterDelete){
+            System.out.println(object);
         }
 
         // Display the transaction logs

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -139,6 +140,12 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         return result;
     }
     
+    public List<AwsPatternDetected> Execute(String imageBase64){
+        Image coucou = new Image(StandardCharsets.UTF_8.encode(imageBase64));
+        Image coucou = new Image(imageBase64.getBytes());
+        return new ArrayList<AwsPatternDetected>();
+    }
+
     public void Close(){
         rekClient.close();
     }

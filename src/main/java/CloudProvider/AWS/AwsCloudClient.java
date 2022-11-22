@@ -81,7 +81,7 @@ public class AwsCloudClient implements ICloudClient {
         return objectHelper.GetObject(objectKey);
     }
 
-    public List<S3Object> ListObjects(){
+    public List<String> ListObjects(){
         return objectHelper.ListObjects();
     }
 

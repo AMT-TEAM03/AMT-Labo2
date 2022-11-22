@@ -5,10 +5,19 @@ import java.util.Map;
 
 public interface ILabelDetector<T> {
 
-    // TODO ajouter des explications, on comprends pas ce qu'il faut mettre dans
+    // TODOR ajouter des explications, on comprends pas ce qu'il faut mettre dans
     // params, ici j'utiliserais la javadoc pour que ce soit disponible facilement à
     // l'utilisation et à l'implémentation
-    public List<T> Execute(String imageUri, Map<String, Object> params);
+    // RES added javadoc
+    /**
+     * Execute method
+     * @param imageUri The AWS Key of the image to analyze 
+     * @param params Some additional parameters if needed by Cloud Provider other than AWS. null if AWS.
+     * @return La liste des labels detecte dans l'image
+     */
+    public List<T> Execute(String imageKey, Map<String, Object> params);
 
-    // TODO Label detection with base64 picture
+    // TODOR Label detection with base64 picture
+    // RES Added label detection with base64 picture
+    public List<T> Execute(String imageBase64);
 }

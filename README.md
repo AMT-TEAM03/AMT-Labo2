@@ -17,8 +17,9 @@ Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable
 
 Une fois maven installé, il faut installer les dépendances avec la commande :  
 
-> TODO votre commande fait tourner les tests ce qui n'est pas désirable à cette étape.
-```mvn clean install ```
+> TODOR votre commande fait tourner les tests ce qui n'est pas désirable à cette étape.
+> RES added -DskipTests
+```mvn clean install -DskipTests```
 
 ### Mise en place des settings AWS nécessaires
 Actuellement, le projet est fait pour tourner avec AWS et utilise [AWS S3](https://aws.amazon.com/s3/) pour le storage

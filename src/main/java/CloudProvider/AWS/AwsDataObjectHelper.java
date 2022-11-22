@@ -5,6 +5,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import CloudProvider.IDataObject;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -126,7 +127,7 @@ public class AwsDataObjectHelper implements IDataObject{
         return response;
     }
 
-    public List<S3Object> ListObjects(){
+    public List<String> ListObjects(){
         String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
@@ -138,7 +139,7 @@ public class AwsDataObjectHelper implements IDataObject{
                     .build();
 
             ListObjectsResponse res = s3Client.listObjects(listObjects);
-            return res.contents();
+            return res.contents().stream().map(elem -> elem.key()).collect(Collectors.toList());
         } catch (S3Exception e) {
             System.err.println(e.awsErrorDetails().errorMessage());
             return null;
