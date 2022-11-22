@@ -10,7 +10,7 @@ public interface ILabelDetector<T> {
     // l'utilisation et à l'implémentation
     // RES added javadoc
     /**
-     * Execute method
+     * Execute method, detects the labels in an image
      * @param imageUri The AWS Key of the image to analyze 
      * @param params Some additional parameters if needed by Cloud Provider other than AWS. null if AWS.
      * @return La liste des labels detecte dans l'image
@@ -19,5 +19,11 @@ public interface ILabelDetector<T> {
 
     // TODOR Label detection with base64 picture
     // RES Added label detection with base64 picture
+    /**
+     * Execute method, detects the labels in an image
+     * 
+     * @param imageBase64 A base64 string representing an image
+     * @return La liste des labels detecte dans l'image
+     */
     public List<T> Execute(String imageBase64);
 }

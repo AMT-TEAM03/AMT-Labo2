@@ -42,7 +42,6 @@ public class Main {
 
         // Optional, default value is "amt.team03.diduno.education"
         client.SetBucketUrl("amt.team03.diduno.education");
-
         // List all objects
         System.out.println("\n\nList objects : ");
         List<String> objects = client.ListObjects();
@@ -51,7 +50,7 @@ public class Main {
         }
 
         // Create an object
-        URL url = client.CreateObject(imgKey, java.util.Base64.getDecoder().decode(dataRow));
+        URL url = client.CreateObject(imgKey, Base64.getDecoder().decode(dataRow));
 
         // List all objects after creating object
         System.out.println("\n\nList objects after creation : ");
