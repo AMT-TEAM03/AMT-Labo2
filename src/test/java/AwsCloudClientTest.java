@@ -33,6 +33,11 @@ class AWSTest {
     static AwsCloudClient _awsClient;
     static String _base64Img;
 
+    // TODO Given-When-Then-ifiez vos tests (utilisez une approche BDD)
+
+    // TODO pas de tests concernant la labélisation d'une image en base64 (pas
+    // implémenté non plus)
+
     @BeforeAll
     static void beforeAll() throws IOException {
         // Instantiate singleton instance
@@ -58,7 +63,7 @@ class AWSTest {
     }
 
     @BeforeEach
-    void beforeEach(){
+    void beforeEach() {
         _awsClient.CreateObject("testing123", java.util.Base64.getDecoder().decode(_base64Img));
     }
 
@@ -67,21 +72,22 @@ class AWSTest {
         URL url = _awsClient.CreateObject("testing1234", java.util.Base64.getDecoder().decode(_base64Img));
         assertNotNull(url);
         // Expect this one to fail as already exist
-        assertThrows(Error.class, () -> _awsClient.CreateObject("testing1234", java.util.Base64.getDecoder().decode(_base64Img)));
+        assertThrows(Error.class,
+                () -> _awsClient.CreateObject("testing1234", java.util.Base64.getDecoder().decode(_base64Img)));
         _awsClient.DeleteObject("testing1234");
     }
 
-    @Test 
-    void testDoesObjectExists(){
+    @Test
+    void testDoesObjectExists() {
         assertTrue(_awsClient.DoesObjectExists("testing123"));
     }
 
     @Test
-    void testListObjects(){
+    void testListObjects() {
         List<S3Object> result = _awsClient.ListObjects();
         boolean found = false;
-        for(S3Object object : result){
-            if(object.key().equals("testing123")){
+        for (S3Object object : result) {
+            if (object.key().equals("testing123")) {
                 found = true;
                 break;
             }
@@ -90,19 +96,19 @@ class AWSTest {
     }
 
     @Test
-    void testGetObject() throws IOException{
+    void testGetObject() throws IOException {
         String objectContent = "coucou tout le monde!";
         _awsClient.CreateObject("testing12345", objectContent.getBytes());
         InputStream objectStream = _awsClient.GetObject("testing12345");
         _awsClient.DeleteObject("testing12345");
         String result = new BufferedReader(new InputStreamReader(objectStream))
-            .lines().collect(Collectors.joining("\n"));
+                .lines().collect(Collectors.joining("\n"));
         objectStream.close();
         assertEquals(objectContent, new String(result));
     }
 
     @Test
-    void testDeleteObject(){
+    void testDeleteObject() {
         // Delete object
         _awsClient.DeleteObject("testing123");
         assertFalse(_awsClient.DoesObjectExists("testing123"));
@@ -110,7 +116,7 @@ class AWSTest {
     }
 
     @Test
-    void testDetection(){
+    void testDetection() {
         _awsClient.ResetLogging();
         List<AwsPatternDetected> result = _awsClient.Execute("testing123", null);
         assertTrue(_awsClient.DoesObjectExists("testing123_result"));
@@ -118,7 +124,7 @@ class AWSTest {
         // Check Caching
         List<AwsPatternDetected> cachedResult = _awsClient.Execute("testing123", null);
         assertEquals(result.size(), cachedResult.size());
-        for(int i = 0; i < result.size(); i++){
+        for (int i = 0; i < result.size(); i++) {
             assertEquals(result.get(i).name, cachedResult.get(i).name);
             assertEquals(result.get(i).confidence, cachedResult.get(i).confidence);
         }
@@ -126,15 +132,16 @@ class AWSTest {
         // Get logging content as string
         InputStream logStream = _awsClient.GetObject("logs");
         String logString = new BufferedReader(new InputStreamReader(logStream))
-            .lines().collect(Collectors.joining("\n"));
+                .lines().collect(Collectors.joining("\n"));
         // JSonArray representing the cached result
         Gson g = new Gson();
-        JsonArray cacheResult = JsonParser .parseString(logString).getAsJsonArray();
-        Type cacheType = new TypeToken<List<AwsLogEntry>>(){}.getType();
+        JsonArray cacheResult = JsonParser.parseString(logString).getAsJsonArray();
+        Type cacheType = new TypeToken<List<AwsLogEntry>>() {
+        }.getType();
         List<AwsLogEntry> logs = g.fromJson(cacheResult, cacheType);
         boolean found = false;
-        for(AwsLogEntry log : logs){
-            if(log.fileTreatedKey.equals("testing123")){
+        for (AwsLogEntry log : logs) {
+            if (log.fileTreatedKey.equals("testing123")) {
                 found = true;
                 break;
             }
@@ -143,12 +150,12 @@ class AWSTest {
     }
 
     @AfterEach
-    void afterEach(){
+    void afterEach() {
         _awsClient.DeleteObject("testing123");
     }
 
     @AfterAll
-    static void tearDown(){
+    static void tearDown() {
         _awsClient.Close();
     }
 }
