@@ -26,8 +26,11 @@ import com.google.gson.reflect.TypeToken;
 import CloudProvider.AWS.AwsCloudClient;
 import CloudProvider.AWS.JSON.AwsLogEntry;
 import CloudProvider.AWS.JSON.AwsPatternDetected;
+//TODO REVIEW this test class shouldn't have any reference to aws sdk
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+//TODO REVIEW split this test class to get a test class for the bucket, and an another one for labeldetection
+//TODO REVIEW refactor the whole class in BDD style !
 class AWSTest {
 
     static AwsCloudClient _awsClient;
@@ -143,11 +146,13 @@ class AWSTest {
     }
 
     @AfterEach
+    //TODO REVIEW To avoid exception (self generated ;) test before deleting
     void afterEach(){
         _awsClient.DeleteObject("testing123");
     }
 
     @AfterAll
+    //TODO REVIEW To avoid exception (self generated ;) test before closing
     static void tearDown(){
         _awsClient.Close();
     }
