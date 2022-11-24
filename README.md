@@ -75,7 +75,12 @@ Pour la CI de github, nous utilisons des variables d'environnements tirées des 
 besoin d'upload des fichiers contenants des informations sensibles.
 
 Les test utilise des variables d'environnement au lieu d'un profile AWS afin que les tests puissent être effectués 
-par github.
+par github.  
+
+Fermeture d'un client
+La fermeture d'un client AWS ne nécessite aucune gestion d'exception, comme indiqué dans la 
+doc de l'interface [SdkAutoCloseable](https://sdk.amazonaws.com/java/api/2.0.0/software/amazon/awssdk/utils/SdkAutoCloseable.html)
+utilisée pour la fermeture des clients.
 
 Compiler le projet  
 ```mvn package```  
