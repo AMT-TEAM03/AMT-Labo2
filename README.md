@@ -108,4 +108,5 @@ On reçoit alors une série d'informations:
 - La liste des objets présents dans le bucket après destruction d'un nouvel objet.
 - Un affichage des logs de toutes les actions effectuée sur ce bucket depuis le dernier reset.
 
-> TODO pour les choix technologiques précisez  version de JAVA et du SDK java AWS ainsi que pourquoi vous les avez choisit.
+> TODOR pour les choix technologiques précisez  version de JAVA et du SDK java AWS ainsi que pourquoi vous les avez choisit.
+> RES Added Java and AWS SDK version to the wiki The reasons for choosing all technologies are listed below every technology.

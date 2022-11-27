@@ -31,8 +31,9 @@ import CloudProvider.AWS.JSON.AwsPatternDetected;
 // import software.amazon.awssdk.services.s3.model.S3Object;
 
 //TODOR REVIEW split this test class to get a test class for the bucket, and an another one for labeldetection
-// Created 2 test class and splitted test between them
-//TODO REVIEW refactor the whole class in BDD style !
+// RES > Created 2 test class and splitted test between them
+//TODOR REVIEW refactor the whole class in BDD style !
+// RES > changed test to look more like BDD
 
 class AWSDataObjectHelperTests{
     static AwsCloudClient _awsClient;
@@ -204,13 +205,15 @@ class AWSLabelDetectorHelperTests{
     }
 
     @Test
-    void testCaching(){
+    void testCaching_True(){
         _awsClient.ResetLogging();
         List<AwsPatternDetected> result = _awsClient.Execute("testing123", null);
-        //assertTrue(_awsClient.DoesObjectExists("testing123_result"));
-        //assertTrue(_awsClient.DoesObjectExists("logs"));
+
         // Check Caching
         List<AwsPatternDetected> cachedResult = _awsClient.Execute("testing123", null);
+
+        assertTrue(_awsClient.DoesObjectExists("testing123_result"));
+        assertTrue(_awsClient.DoesObjectExists("logs"));
         assertEquals(result.size(), cachedResult.size());
         for (int i = 0; i < result.size(); i++) {
             assertEquals(result.get(i).name, cachedResult.get(i).name);
@@ -218,17 +221,20 @@ class AWSLabelDetectorHelperTests{
         }
     }
 
+
     @Test
     void testTransactionLog(){
         InputStream logStream = _awsClient.GetObject("logs");
         String logString = new BufferedReader(new InputStreamReader(logStream))
                 .lines().collect(Collectors.joining("\n"));
+
         // JSonArray representing the cached result
         Gson g = new Gson();
         JsonArray cacheResult = JsonParser.parseString(logString).getAsJsonArray();
         Type cacheType = new TypeToken<List<AwsLogEntry>>() {
         }.getType();
         List<AwsLogEntry> logs = g.fromJson(cacheResult, cacheType);
+
         boolean found = false;
         for (AwsLogEntry log : logs) {
             if (log.fileTreatedKey.equals("testing123")) {
