@@ -1,4 +1,4 @@
-package CloudProvider;
+package ObjectManager.CloudProvider;
 
 import java.io.InputStream;
 import java.net.URL;

@@ -17,10 +17,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import CloudProvider.AWS.AwsCloudClient;
+import ObjectManager.CloudProvider.AWS.AwsDataObjectHelper;
 
 class AWSDataObjectHelperTests {
-    static AwsCloudClient _awsClient;
+    static AwsDataObjectHelper _awsClient;
     static String _base64Img;
     static final String[] OBJECT_KEY_LIST = {
             "testing123",
@@ -40,7 +40,7 @@ class AWSDataObjectHelperTests {
     @BeforeAll
     static void beforeAll() throws IOException {
         // Instantiate singleton instance
-        _awsClient = AwsCloudClient.getInstance();
+        _awsClient = new AwsDataObjectHelper();
         // Encode an image in a base64 like string
         // image path declaration
         String imgPath = "./src/main/resources/coucou.jpg";
