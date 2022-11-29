@@ -11,10 +11,15 @@ de pouvoir tester le programme
 
 ## Débuter sur le projet
 ### Installation de maven
+
+
 Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
 
 Une fois maven installé, il faut installer les dépendances avec la commande :  
-```mvn clean install ```
+
+> TODOR votre commande fait tourner les tests ce qui n'est pas désirable à cette étape.
+> RES added -DskipTests
+```mvn clean install -DskipTests```
 
 ### Mise en place des settings AWS nécessaires
 Actuellement, le projet est fait pour tourner avec AWS et utilise [AWS S3](https://aws.amazon.com/s3/) pour le storage
@@ -70,7 +75,12 @@ Pour la CI de github, nous utilisons des variables d'environnements tirées des 
 besoin d'upload des fichiers contenants des informations sensibles.
 
 Les test utilise des variables d'environnement au lieu d'un profile AWS afin que les tests puissent être effectués 
-par github.
+par github.  
+
+Fermeture d'un client
+La fermeture d'un client AWS ne nécessite aucune gestion d'exception, comme indiqué dans la 
+doc de l'interface [SdkAutoCloseable](https://sdk.amazonaws.com/java/api/2.0.0/software/amazon/awssdk/utils/SdkAutoCloseable.html)
+utilisée pour la fermeture des clients.
 
 Compiler le projet  
 ```mvn package```  
@@ -98,3 +108,5 @@ On reçoit alors une série d'informations:
 - La liste des objets présents dans le bucket après destruction d'un nouvel objet.
 - Un affichage des logs de toutes les actions effectuée sur ce bucket depuis le dernier reset.
 
+> TODOR pour les choix technologiques précisez  version de JAVA et du SDK java AWS ainsi que pourquoi vous les avez choisit.
+> RES Added Java and AWS SDK version to the wiki The reasons for choosing all technologies are listed below every technology.

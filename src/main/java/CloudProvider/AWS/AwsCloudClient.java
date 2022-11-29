@@ -7,7 +7,6 @@ import java.util.Map;
 
 import CloudProvider.ICloudClient;
 import CloudProvider.AWS.JSON.AwsPatternDetected;
-import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 public class AwsCloudClient implements ICloudClient {
@@ -81,7 +80,7 @@ public class AwsCloudClient implements ICloudClient {
         return objectHelper.GetObject(objectKey);
     }
 
-    public List<S3Object> ListObjects(){
+    public List<String> ListObjects(){
         return objectHelper.ListObjects();
     }
 
@@ -95,6 +94,10 @@ public class AwsCloudClient implements ICloudClient {
 
     public List<AwsPatternDetected> Execute(String imageUri, Map<String, Object> params){
         return labelHelper.Execute(imageUri, params);
+    }
+
+    public List<AwsPatternDetected> Execute(String imageBase64) {
+        return labelHelper.Execute(imageBase64);
     }
     
     public void Close() {
