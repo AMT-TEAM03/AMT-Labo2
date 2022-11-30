@@ -12,6 +12,9 @@ ENV AWS_SECRET_ACCESS_KEY $aws_secret_access_key
 ENV AWS_REGION eu-west-2
 
 WORKDIR /app
+
+RUN echo $AWS_ACCESS_KEY_ID
+
 RUN mvn install
 
 CMD mvn exec:java
