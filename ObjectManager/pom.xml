@@ -74,7 +74,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Main</mainClass>
+                            <mainClass>ObjectManager.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -105,6 +105,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <mainClass>ObjectManager.Main</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
