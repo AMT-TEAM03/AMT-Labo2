@@ -68,7 +68,6 @@ LabelDetector-test:
   script:
     - docker run -p 9090:9090 test_label_detector
 
-
 # on:
 #   push:
 #     branches: [ "develop" ]
