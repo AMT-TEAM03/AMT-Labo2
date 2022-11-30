@@ -24,4 +24,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build -t object_manager --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./ObjectManager/ && docker run -p 9090:9090 object_manager
+      run: docker build -t object_manager --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./ObjectManager/
