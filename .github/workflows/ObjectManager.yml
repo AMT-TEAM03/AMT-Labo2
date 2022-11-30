@@ -1,0 +1,22 @@
+name: ObjectManager Docker CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'ObjectManager/**'
+  pull_request:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'ObjectManager/**'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build -t object_manager --build-arg aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }} ./ObjectManager/
