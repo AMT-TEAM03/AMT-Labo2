@@ -11,7 +11,7 @@ public class SuccessResponse<T> implements IResponse {
         this.data = data;
     }
 
-    public boolean getSucess(){
+    public boolean getSuccess(){
         return this.success;
     }
 

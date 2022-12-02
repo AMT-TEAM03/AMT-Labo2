@@ -63,7 +63,9 @@ public class ObjectController {
         @PathVariable(value="name") String name
     ){
         try{
-            objectHelper.DeleteObject(name);
+            if(objectHelper.DoesObjectExists(name)){   
+                objectHelper.DeleteObject(name);
+            }
             return new SuccessResponse<>("success");
         }catch(Exception e){
             return new ErrorResponse(e.getMessage());
