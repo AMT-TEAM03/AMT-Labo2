@@ -5,9 +5,12 @@ import java.net.URL;
 import java.util.List;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import ObjectManager.CloudProvider.AWS.AwsDataObjectHelper;
@@ -16,6 +19,7 @@ import ObjectManager.utils.IResponse;
 import ObjectManager.utils.SuccessResponse;
 
 @RestController
+@RequestMapping("/v1")
 public class ObjectController {
     private AwsDataObjectHelper objectHelper;
 
@@ -23,7 +27,7 @@ public class ObjectController {
         objectHelper = new AwsDataObjectHelper();
     }
 
-    @PostMapping(value="/v1/object", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
     public IResponse CreateObject(
         @RequestParam(value="name", defaultValue="None") String name,
         @RequestParam(value="image", defaultValue="None") String objectBase64
@@ -42,19 +46,31 @@ public class ObjectController {
         return new SuccessResponse<>("Image Created.");
     }
 
-    @GetMapping(value="/v1/object", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/object/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public IResponse DownloadObject(
-        @RequestParam(value="key", defaultValue = "None") String key
+        @PathVariable(value="name") String name
     ){
         try{
-            InputStream object = objectHelper.GetObject(key);
+            InputStream object = objectHelper.GetObject(name);
             return new SuccessResponse<>(object);
         }catch(Exception e){
             return new ErrorResponse(e.getMessage());
         }
     }
 
-    @GetMapping(value="/v1/objects", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value="/object/{name}")
+    public IResponse DeleteObject(
+        @PathVariable(value="name") String name
+    ){
+        try{
+            objectHelper.DeleteObject(name);
+            return new SuccessResponse<>("success");
+        }catch(Exception e){
+            return new ErrorResponse(e.getMessage());
+        }
+    }
+
+    @GetMapping(value="/objects", produces = MediaType.APPLICATION_JSON_VALUE)
     public IResponse ListObjects(){
         try{
             List<String> response = objectHelper.ListObjects();
@@ -62,6 +78,18 @@ public class ObjectController {
                 return new ErrorResponse("Empty bucket.");
             }
             return new SuccessResponse<>(response);
+        }catch(Exception e){
+            return new ErrorResponse(e.getMessage());
+        }
+    }
+
+    @GetMapping(value="/object/{name}/url")
+    public IResponse GetObjectUrl(
+        @PathVariable(value="name") String name
+    ){
+        try{
+            URL objectUrl = objectHelper.GetUrl(name);
+            return new SuccessResponse<>(objectUrl.toString());
         }catch(Exception e){
             return new ErrorResponse(e.getMessage());
         }
