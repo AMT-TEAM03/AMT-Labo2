@@ -1,4 +1,4 @@
-package CloudProvider.AWS.JSON;
+package LabelDetector.CloudProvider.AWS.JSON;
 
 public class AwsLogEntry {
     public long duration;

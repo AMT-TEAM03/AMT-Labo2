@@ -1,57 +1,59 @@
-package CloudProvider.AWS;
+package LabelDetector.CloudProvider.AWS;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
+import LabelDetector.CloudProvider.ILabelDetector;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-
-import CloudProvider.ILabelDetector;
-import CloudProvider.AWS.JSON.AwsLogEntry;
-import CloudProvider.AWS.JSON.AwsPatternDetected;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
-import software.amazon.awssdk.services.rekognition.model.DetectLabelsRequest;
-import software.amazon.awssdk.services.rekognition.model.DetectLabelsResponse;
-import software.amazon.awssdk.services.rekognition.model.Image;
-import software.amazon.awssdk.services.rekognition.model.Label;
-import software.amazon.awssdk.services.rekognition.model.RekognitionException;
-import software.amazon.awssdk.services.rekognition.model.S3Object;
+import software.amazon.awssdk.services.rekognition.model.*;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
     private RekognitionClient rekClient;
+    private String bucketUrl;
     private int confidence_threshold = 90;
     private int MAX_PATTERN = 10;
 
     public AwsLabelDetectorHelper(){
-        rekClient = RekognitionClient.builder()
-        .build();
+        rekClient = RekognitionClient.builder().build();
+        try {
+            String propertiesPath = Paths.get(
+                            getClass().getClassLoader().getResource("application.properties").toURI()).toFile()
+                    .getAbsolutePath();
+            InputStream input = new FileInputStream(propertiesPath);
+            Properties prop = new Properties();
+            // load a properties file
+            prop.load(input);
+            // get the property value and print it out
+            this.bucketUrl = prop.getProperty("bucket.url");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
+    //@PutMapping(value = "/v1/confidence/set")
     public void SetConfidenceThreshold(int confidence){
         this.confidence_threshold = confidence;
     }
 
-    public void ResetLogging(){
+    //@PutMapping(value = "/v1/reset/log")
+    /*public void ResetLogging(){
         AwsCloudClient client = AwsCloudClient.getInstance();
         String bucketUrl = client.GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
         client.DeleteObject("logs");
-    }
+    }*/
 
-    public List<AwsPatternDetected> Execute(String imageKey, Map<String, Object> params){
+    //@GetMapping(value = "/v1/patterns/b64")
+    /*public List<AwsPatternDetected> Execute(String imageKey, Map<String, Object> params){
         AwsCloudClient client = AwsCloudClient.getInstance();
         String bucketUrl = client.GetBucketUrl();
         if(bucketUrl == null){
@@ -139,14 +141,11 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         }
         
         return result;
-    }
-    
+    }*/
+
+    //@GetMapping(value = "/v1/patterns/picture")
     public List<AwsPatternDetected> Execute(String imageBase64){
-        AwsCloudClient client = AwsCloudClient.getInstance();
-        String bucketUrl = client.GetBucketUrl();
-        if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
-        }
+
         List<AwsPatternDetected> result = new ArrayList<AwsPatternDetected>();
         Gson g = new Gson();
         // Detect the labels
@@ -167,26 +166,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
             long endTime = System.currentTimeMillis();
             long time = (endTime - startTime);
-            List<AwsLogEntry> logs;
-            if (client.DoesObjectExists("logs")) {
-                // Get logging content as string
-                InputStream logStream = client.GetObject("logs");
-                String logString = new BufferedReader(new InputStreamReader(logStream))
-                        .lines().collect(Collectors.joining("\n"));
-                // JSonArray representing the cached result
-                JsonArray cacheResult = JsonParser.parseString(logString).getAsJsonArray();
-                Type cacheType = new TypeToken<List<AwsLogEntry>>() {
-                }.getType();
-                logs = g.fromJson(cacheResult, cacheType);
-                // Remove old log file
-                client.DeleteObject("logs");
-            } else {
-                logs = new ArrayList<>();
-            }
-            logs.add(new AwsLogEntry("Base64 Image", time));
-            // Upload new log file
-            String jsonLogs = g.toJson(logs);
-            client.CreateObject("logs", jsonLogs.getBytes());
+
             // Extract labels from response
             labels = labelsResponse.labels();
         } catch (RekognitionException e) {

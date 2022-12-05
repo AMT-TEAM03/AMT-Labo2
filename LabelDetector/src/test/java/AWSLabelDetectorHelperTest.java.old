@@ -22,9 +22,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-import CloudProvider.AWS.AwsCloudClient;
-import CloudProvider.AWS.JSON.AwsLogEntry;
-import CloudProvider.AWS.JSON.AwsPatternDetected;
+import LabelDetector.CloudProvider.AWS.JSON.AwsLogEntry;
+import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
 
 class AWSLabelDetectorHelperTests {
 

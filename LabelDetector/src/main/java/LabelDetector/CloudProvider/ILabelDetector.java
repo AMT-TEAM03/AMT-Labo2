@@ -1,7 +1,6 @@
-package CloudProvider;
+package LabelDetector.CloudProvider;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ILabelDetector<T> {
 
@@ -15,7 +14,7 @@ public interface ILabelDetector<T> {
      * @param params Some additional parameters if needed by Cloud Provider other than AWS. null if AWS.
      * @return La liste des labels detecte dans l'image
      */
-    public List<T> Execute(String imageKey, Map<String, Object> params);
+    //public List<T> Execute(String imageKey, Map<String, Object> params);
 
     // TODOR Label detection with base64 picture
     // RES Added label detection with base64 picture
