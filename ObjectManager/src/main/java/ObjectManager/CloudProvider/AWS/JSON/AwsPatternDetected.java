@@ -1,4 +1,4 @@
-package CloudProvider.AWS.JSON;
+package ObjectManager.CloudProvider.AWS.JSON;
 
 public class AwsPatternDetected {
     public String name;

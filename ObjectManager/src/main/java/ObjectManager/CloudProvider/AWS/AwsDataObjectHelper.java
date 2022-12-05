@@ -1,13 +1,18 @@
-package CloudProvider.AWS;
+package ObjectManager.CloudProvider.AWS;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
-import CloudProvider.IDataObject;
+import ObjectManager.CloudProvider.IDataObject;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
@@ -37,14 +42,32 @@ import software.amazon.awssdk.core.waiters.WaiterResponse;
 
 public class AwsDataObjectHelper implements IDataObject{
     private S3Client s3Client;
+    private String bucketUrl;
+    private S3Presigner presigner;
 
     public AwsDataObjectHelper(){
         s3Client = S3Client.builder()
                 .build();
+        this.presigner = S3Presigner.create();
+        try {
+            String propertiesPath = Paths.get(
+                    getClass().getClassLoader().getResource("application.properties").toURI()).toFile()
+                    .getAbsolutePath();
+            InputStream input = new FileInputStream(propertiesPath);
+            Properties prop = new Properties();
+            // load a properties file
+            prop.load(input);
+            // get the property value and print it out
+            this.bucketUrl = prop.getProperty("bucket.url");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public URL CreateObject(String objectKey, byte[] content){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        String bucketUrl = this.bucketUrl; //AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -66,8 +89,8 @@ public class AwsDataObjectHelper implements IDataObject{
     }
     
     public URL GetUrl(String objectKey){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
-        S3Presigner presigner = AwsCloudClient.getInstance().GetPresigner();
+        String bucketUrl = this.bucketUrl; //AwsCloudClient.getInstance().GetBucketUrl();
+        S3Presigner presigner = this.presigner; //AwsCloudClient.getInstance().GetPresigner();
         if (bucketUrl == null) {
             throw new Error("Bucket URL not set...");
         }
@@ -94,8 +117,8 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public void DeleteObject(String objectKey){
-        AwsCloudClient client = AwsCloudClient.getInstance();
-        String bucketUrl = client.GetBucketUrl();
+        //AwsCloudClient client = AwsCloudClient.getInstance();
+        String bucketUrl = this.bucketUrl; //client.GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -105,7 +128,7 @@ public class AwsDataObjectHelper implements IDataObject{
                         .build();
         s3Client.deleteObject(delReq);
         // Remove the label detection cache if exists 
-        if(client.DoesObjectExists(objectKey + "_result")){
+        if(this.DoesObjectExists(objectKey + "_result")){
             delReq = DeleteObjectRequest.builder()
                         .bucket(bucketUrl)
                         .key(objectKey + "_result")
@@ -115,7 +138,7 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public InputStream GetObject(String objectKey){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        String bucketUrl = this.bucketUrl; //AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -128,7 +151,7 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public List<String> ListObjects(){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        String bucketUrl = this.bucketUrl; //AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -147,7 +170,7 @@ public class AwsDataObjectHelper implements IDataObject{
     }
     
     public boolean DoesObjectExists(String  objectKey){
-        String bucketUrl = AwsCloudClient.getInstance().GetBucketUrl();
+        String bucketUrl = this.bucketUrl; //AwsCloudClient.getInstance().GetBucketUrl();
         if(bucketUrl == null){
             throw new Error("Bucket URL not set...");
         }
@@ -217,6 +240,10 @@ public class AwsDataObjectHelper implements IDataObject{
         List<String> result = new ArrayList<String>();
         listBucketsResponse.buckets().stream().forEach(x -> result.add(x.name()));
         return result;
+    }
+
+    public void ResetLoggig(){
+        this.DeleteObject("logs");
     }
 
     public void Close(){

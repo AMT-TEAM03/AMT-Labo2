@@ -110,3 +110,13 @@ On reçoit alors une série d'informations:
 
 > TODOR pour les choix technologiques précisez  version de JAVA et du SDK java AWS ainsi que pourquoi vous les avez choisit.
 > RES Added Java and AWS SDK version to the wiki The reasons for choosing all technologies are listed below every technology.
+
+## Build and run docker container for ObjectManager
+
+Build:
+
+```docker build -t <container_flag> --build-arg aws_access_key_id=<AWS access key id> --build-arg aws_secret_access_key=<AWS secret access key> ./ObjectManager```  
+
+Run:
+
+```docker run -p 9090:9090 <container_flag>```  
