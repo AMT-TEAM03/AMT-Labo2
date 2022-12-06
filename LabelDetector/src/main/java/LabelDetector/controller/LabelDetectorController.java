@@ -74,9 +74,6 @@ public class LabelDetectorController {
             detector.SetMaxPattern(maxPattern);
             detector.SetConfidenceThreshold(minConfidence);
             List<IAwsJsonResponse> response = detector.Execute(imageUrl);
-            if(response == null){
-                return new ErrorResponse("Label detection failed");
-            }
             return new SuccessResponse<>(response);
         }catch(Exception e){
             return new ErrorResponse(e.getMessage());

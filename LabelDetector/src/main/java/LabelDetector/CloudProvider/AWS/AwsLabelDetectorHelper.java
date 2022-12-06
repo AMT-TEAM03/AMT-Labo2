@@ -23,19 +23,6 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
 
     public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder().build();
-        try {
-            String propertiesPath = Paths.get(
-                            getClass().getClassLoader().getResource("application.properties").toURI()).toFile()
-                    .getAbsolutePath();
-            InputStream input = new FileInputStream(propertiesPath);
-            Properties prop = new Properties();
-            // load a properties file
-            prop.load(input);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
     public void SetConfidenceThreshold(int confidence){
@@ -54,7 +41,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         return this.maxPattern;
     }
 
-    public List<IAwsJsonResponse> Execute(URL imageUrl){
+    public List<IAwsJsonResponse> Execute(URL imageUrl) throws IllegalArgumentException, IOException {
         List<IAwsJsonResponse> result = new ArrayList<>();
         Gson g = new Gson();
         // Detect the labels
@@ -77,11 +64,9 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             // Extract labels from response
             labels = labelsResponse.labels();
         } catch (RekognitionException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return null;
+            throw new IllegalArgumentException("Reckognition has encountered an issue : " + e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException("URL not reconized" + e.getMessage());
         }
         // Parse patternList
         int patternDetected = 0;

@@ -39,7 +39,7 @@ class LabelDetectorControllerTests {
     public void shouldNotReturnListTimeAndPatterns() throws Exception {
         mockMvc.perform(get("/v1/execute").param("imageUrlString", "https://www.google.ch"))
                 .andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"error\":\"Label detection failed\"")));
+                .andExpect(content().string(containsString("Reckognition has encountered an issue")));
     }
 
     @Test
