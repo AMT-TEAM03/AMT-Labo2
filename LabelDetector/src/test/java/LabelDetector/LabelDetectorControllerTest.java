@@ -24,7 +24,7 @@ class LabelDetectorControllerTests {
     static String imageUrl;
 
     @BeforeTestClass
-    void beforeAll() throws Exception {
+    void beforeAll(){
         imageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg";
     }
 

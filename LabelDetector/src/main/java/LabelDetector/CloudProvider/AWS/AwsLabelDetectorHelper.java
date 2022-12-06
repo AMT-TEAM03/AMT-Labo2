@@ -11,9 +11,7 @@ import software.amazon.awssdk.services.rekognition.model.*;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
@@ -66,7 +64,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         } catch (RekognitionException e) {
             throw new IllegalArgumentException("Reckognition has encountered an issue : " + e.getMessage());
         } catch (IOException e) {
-            throw new IOException("URL not reconized" + e.getMessage());
+            throw new IOException("URL not recognized" + e.getMessage());
         }
         // Parse patternList
         int patternDetected = 0;

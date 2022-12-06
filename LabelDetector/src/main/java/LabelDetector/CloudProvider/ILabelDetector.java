@@ -8,14 +8,13 @@ import java.util.List;
 
 public interface ILabelDetector<T> {
 
-    // TODOR Label detection with base64 picture
-    // RES Added label detection with base64 picture
     /**
      * Execute method, detects the labels in an image
      * 
-     * @param imageBase64 A base64 string representing an image
-     * @return La liste des labels detecte dans l'image
+     * @param imageUrl link towards a pictures
+     * @return La liste des labels detectés dans l'image ainsi que le temps de calcul des labels.
+     * @exception IllegalArgumentException
+     * @exception IOException
      */
-
     public List<IAwsJsonResponse> Execute(URL imageUrl) throws IllegalArgumentException, IOException;
 }
