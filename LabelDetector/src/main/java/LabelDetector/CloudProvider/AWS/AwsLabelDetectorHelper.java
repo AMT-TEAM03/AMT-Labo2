@@ -1,6 +1,8 @@
 package LabelDetector.CloudProvider.AWS;
 
+import LabelDetector.CloudProvider.AWS.JSON.AwsJsonInterface;
 import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
+import LabelDetector.CloudProvider.AWS.JSON.AwsTimeTaken;
 import LabelDetector.CloudProvider.ILabelDetector;
 import com.google.gson.Gson;
 import software.amazon.awssdk.core.SdkBytes;
@@ -144,9 +146,10 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
     }*/
 
     //@GetMapping(value = "/v1/patterns/picture")
-    public List<AwsPatternDetected> Execute(String imageBase64){
+    public List<AwsJsonInterface> Execute(String imageBase64){
+        List<AwsJsonInterface> result = new ArrayList<>();
 
-        List<AwsPatternDetected> result = new ArrayList<AwsPatternDetected>();
+        long time = 0;
         Gson g = new Gson();
         // Detect the labels
         List<Label> labels;
@@ -165,7 +168,9 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             long startTime = System.currentTimeMillis();
             DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
             long endTime = System.currentTimeMillis();
-            long time = (endTime - startTime);
+            time = (endTime - startTime);
+
+            result.add(new AwsTimeTaken(time));
 
             // Extract labels from response
             labels = labelsResponse.labels();
@@ -174,7 +179,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             System.out.println(e.getMessage());
             return null;
         }
-        // Parse result
+        // Parse patternList
         int patternDetected = 0;
         for (Label label : labels) {
             if (label.confidence() >= confidence_threshold) {

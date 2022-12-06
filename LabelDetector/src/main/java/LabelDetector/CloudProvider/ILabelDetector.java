@@ -1,6 +1,10 @@
 package LabelDetector.CloudProvider;
 
+import LabelDetector.CloudProvider.AWS.JSON.AwsJsonInterface;
+import LabelDetector.CloudProvider.AWS.JSON.AwsTimeTaken;
+
 import java.util.List;
+import java.util.Map;
 
 public interface ILabelDetector<T> {
 
@@ -24,5 +28,7 @@ public interface ILabelDetector<T> {
      * @param imageBase64 A base64 string representing an image
      * @return La liste des labels detecte dans l'image
      */
-    public List<T> Execute(String imageBase64);
+//    public Map<AwsTimeTaken, List<T>> Execute(String imageBase64);
+
+    public List<AwsJsonInterface> Execute(String imageBase64);
 }
