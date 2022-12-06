@@ -1,12 +1,9 @@
 package LabelDetector.CloudProvider;
 
 import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
-import LabelDetector.CloudProvider.AWS.JSON.AwsTimeTaken;
-import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 public interface ILabelDetector<T> {
 

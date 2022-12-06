@@ -9,15 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.util.Base64;
-
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,41 +21,23 @@ class LabelDetectorControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    static String _base64Img;
+    static String imageUrl;
 
     @BeforeTestClass
     void beforeAll() throws Exception {
-
-        // Encode an image in a base64 like string
-        // image path declaration
-        String imgPath = "./src/main/resources/coucou.jpg";
-        // read image from file
-        FileInputStream stream = new FileInputStream(imgPath);
-        // get byte array from image stream
-        int bufLength = 2048;
-        byte[] buffer = new byte[2048];
-        byte[] data;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int readLength;
-        while ((readLength = stream.read(buffer, 0, bufLength)) != -1) {
-            out.write(buffer, 0, readLength);
-        }
-        data = out.toByteArray();
-        _base64Img = Base64.getEncoder().withoutPadding().encodeToString(data);
-        out.close();
-        stream.close();
+        imageUrl = "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg";
     }
 
     @Test
     public void shouldReturnListTimeAndPatterns() throws Exception {
-        mockMvc.perform(get("/v1/execute").param("imgBase64", _base64Img))
+        mockMvc.perform(get("/v1/execute").param("imageUrlString", imageUrl))
                 .andExpect(status().isOk());
     }
 
 
     @Test
     public void shouldNotReturnListTimeAndPatterns() throws Exception {
-        mockMvc.perform(get("/v1/execute").param("imgBase64", "NotAnImage"))
+        mockMvc.perform(get("/v1/execute").param("imageUrlString", "https://www.google.ch"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"error\":\"Label detection failed\"")));
     }

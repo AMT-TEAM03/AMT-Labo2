@@ -1,9 +1,6 @@
 package LabelDetector.controller;
 
-
 import LabelDetector.CloudProvider.AWS.AwsLabelDetectorHelper;
-import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
-import LabelDetector.CloudProvider.AWS.JSON.AwsTimeTaken;
 import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
 import LabelDetector.utils.ErrorResponse;
 import LabelDetector.utils.IResponse;
@@ -12,10 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/v1")
