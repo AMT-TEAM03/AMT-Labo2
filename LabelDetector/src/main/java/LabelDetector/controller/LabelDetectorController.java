@@ -1,15 +1,16 @@
 package LabelDetector.controller;
 
 import LabelDetector.CloudProvider.AWS.AwsLabelDetectorHelper;
-import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
+import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 import LabelDetector.utils.ErrorResponse;
 import LabelDetector.utils.IResponse;
 import LabelDetector.utils.SuccessResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1")
@@ -22,49 +23,49 @@ public class LabelDetectorController {
     }
 
     @PutMapping(value = "/confidence", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse SetConfidence(
+    public ResponseEntity<IResponse> SetConfidence(
             @RequestParam(value="confidence", defaultValue="90") int confidenceLvl
     ){
         try{
             detector.SetConfidenceThreshold(confidenceLvl);
-            return new SuccessResponse<>("Success");
+            return new ResponseEntity<>(new SuccessResponse<>("Success"), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping(value = "/confidence", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse GetConfidence(){
+    public ResponseEntity<IResponse> GetConfidence(){
         try{
-            return new SuccessResponse<>(detector.GetConfidenceThreshold());
+            return new ResponseEntity<>(new SuccessResponse<>(detector.GetConfidenceThreshold()), HttpStatus.OK);
         }catch (Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping(value = "/max_pattern", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse SetMaxPattern(
+    public ResponseEntity<IResponse> SetMaxPattern(
             @RequestParam(value="maxPattern", defaultValue="90") int maxPattern
     ){
         try{
             detector.SetMaxPattern(maxPattern);
-            return new SuccessResponse<>("Success");
+            return new ResponseEntity<>(new SuccessResponse<>("Success"), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping(value = "/max_pattern", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse GetMaxPattern(){
+    public ResponseEntity<IResponse> GetMaxPattern(){
         try{
-            return new SuccessResponse<>(detector.GetMaxPattern());
+            return new ResponseEntity<>(new SuccessResponse<>(detector.GetMaxPattern()), HttpStatus.OK);
         }catch (Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping(value = "/execute", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse GetLabels(
+    public ResponseEntity<IResponse> GetLabels(
             @RequestParam(value="imageUrlString", defaultValue="None") String imageUrlString,
             @RequestParam(value="maxPattern", defaultValue= "10") int maxPattern,
             @RequestParam(value="minConfidence", defaultValue="90") int minConfidence
@@ -73,10 +74,10 @@ public class LabelDetectorController {
             URL imageUrl = new URL(imageUrlString);
             detector.SetMaxPattern(maxPattern);
             detector.SetConfidenceThreshold(minConfidence);
-            List<IAwsJsonResponse> response = detector.Execute(imageUrl);
-            return new SuccessResponse<>(response);
+            AwsReckognitionResult response = detector.Execute(imageUrl);
+            return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

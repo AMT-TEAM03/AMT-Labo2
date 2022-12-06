@@ -1,8 +1,7 @@
 package LabelDetector.CloudProvider.AWS;
 
-import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
 import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
-import LabelDetector.CloudProvider.AWS.JSON.AwsTimeTaken;
+import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 import LabelDetector.CloudProvider.ILabelDetector;
 import com.google.gson.Gson;
 import software.amazon.awssdk.core.SdkBytes;
@@ -39,8 +38,9 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         return this.maxPattern;
     }
 
-    public List<IAwsJsonResponse> Execute(URL imageUrl) throws IllegalArgumentException, IOException {
-        List<IAwsJsonResponse> result = new ArrayList<>();
+    public AwsReckognitionResult Execute(URL imageUrl) throws IllegalArgumentException, IOException {
+        AwsReckognitionResult result = new AwsReckognitionResult();
+        List<AwsPatternDetected> listPattern = new ArrayList<>();
         Gson g = new Gson();
         // Detect the labels
         List<Label> labels = new ArrayList<>();
@@ -57,7 +57,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             long endTime = System.currentTimeMillis();
             long time = (endTime - startTime);
 
-            result.add(new AwsTimeTaken(time));
+            result.setTime(time);
 
             // Extract labels from response
             labels = labelsResponse.labels();
@@ -70,13 +70,14 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         int patternDetected = 0;
         for (Label label : labels) {
             if (label.confidence() >= confidence_threshold) {
-                result.add(new AwsPatternDetected(label.name(), label.confidence()));
+                listPattern.add(new AwsPatternDetected(label.name(), label.confidence()));
                 patternDetected++;
                 if (patternDetected > maxPattern) {
                     break;
                 }
             }
         }
+        result.setPatternDetected(listPattern);
         return result;
     }
 

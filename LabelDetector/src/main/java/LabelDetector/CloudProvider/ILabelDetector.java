@@ -1,10 +1,9 @@
 package LabelDetector.CloudProvider;
 
-import LabelDetector.CloudProvider.AWS.JSON.IAwsJsonResponse;
+import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 public interface ILabelDetector<T> {
 
@@ -16,5 +15,5 @@ public interface ILabelDetector<T> {
      * @exception IllegalArgumentException
      * @exception IOException
      */
-    public List<IAwsJsonResponse> Execute(URL imageUrl) throws IllegalArgumentException, IOException;
+    public AwsReckognitionResult Execute(URL imageUrl) throws IllegalArgumentException, IOException;
 }
