@@ -1,4 +1,4 @@
 package LabelDetector.CloudProvider.AWS.JSON;
 
-public interface AwsJsonInterface {
+public interface IAwsJsonResponse {
 }

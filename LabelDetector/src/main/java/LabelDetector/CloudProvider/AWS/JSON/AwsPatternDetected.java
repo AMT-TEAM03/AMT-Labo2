@@ -1,6 +1,6 @@
 package LabelDetector.CloudProvider.AWS.JSON;
 
-public class AwsPatternDetected implements AwsJsonInterface {
+public class AwsPatternDetected implements IAwsJsonResponse {
     public String name;
     public float confidence;
 
