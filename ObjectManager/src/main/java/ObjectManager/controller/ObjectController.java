@@ -36,10 +36,10 @@ public class ObjectController {
             return new ErrorResponse("Invalid arguments.");
         }
         try{
-            URL imageUrl = objectHelper.CreateObject(name, objectBase64.getBytes());
-            if (imageUrl == null) {
-                return new ErrorResponse("Image creation failed.");
+            if(!objectHelper.DoesBucketExists()){
+                objectHelper.CreateBucket();
             }
+            objectHelper.CreateObject(name, objectBase64.getBytes());
         }catch(Exception e){
             return new ErrorResponse(e.getMessage());
         }
@@ -85,7 +85,7 @@ public class ObjectController {
         }
     }
 
-    @GetMapping(value="/object/{name}/url")
+    @GetMapping(value="/object/{name}/publish")
     public IResponse GetObjectUrl(
         @PathVariable(value="name") String name
     ){

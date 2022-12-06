@@ -12,7 +12,7 @@ public interface IDataObject {
      * @param content   byte[] representing the content of the file
      * @return A public URL to download the file
      */
-    public URL CreateObject(String objectName, byte[] content);
+    public void CreateObject(String objectName, byte[] content);
 
     /**
      * GetURL method, will return a public URL to download the file

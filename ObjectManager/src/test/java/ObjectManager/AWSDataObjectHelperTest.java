@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,8 +89,7 @@ class AWSDataObjectHelperTests {
 
     @Test
     void testCreateObject_Created() {
-        URL url = _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
-        assertNotNull(url);
+        _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
         assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
     }
 
