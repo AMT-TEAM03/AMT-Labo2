@@ -67,13 +67,13 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
 
-    public void CreateObject(String objectKey, byte[] content){
+    public void CreateObject(String objectKey, byte[] content) throws Exception{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         if(DoesObjectExists(objectKey)){
-            throw new Error("File already exists in the bucket...");
+            throw new Exception("File already exists in the bucket...");
         }
         try {
             PutObjectRequest putOb = PutObjectRequest.builder()
@@ -82,18 +82,18 @@ public class AwsDataObjectHelper implements IDataObject{
                     .build();
             s3Client.putObject(putOb, RequestBody.fromBytes(content));
         } catch (S3Exception e) {
-            throw new Error("S3 Client refused the request : " + e.getMessage());
+            throw new Exception("S3 Client refused the request : " + e.getMessage());
         }
     }
     
-    public URL GetUrl(String objectKey){
+    public URL GetUrl(String objectKey) throws Exception{
         String bucketUrl = this.bucketUrl;
         S3Presigner presigner = this.presigner; //AwsCloudClient.getInstance().GetPresigner();
         if (bucketUrl == null) {
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         if (presigner == null) {
-            throw new Error("No Presigner to generate URL...");
+            throw new Exception("No Presigner to generate URL...");
         }
         // Generate URL valid for 60 minutes
         // Create a GetObjectRequest to be pre-signed
@@ -114,11 +114,11 @@ public class AwsDataObjectHelper implements IDataObject{
         return presignedGetObjectRequest.url();
     }
 
-    public void DeleteObject(String objectKey){
+    public void DeleteObject(String objectKey) throws Exception{
         //AwsCloudClient client = AwsCloudClient.getInstance();
         String bucketUrl = this.bucketUrl; //client.GetBucketUrl();
         if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         DeleteObjectRequest delReq = DeleteObjectRequest.builder()
                         .bucket(bucketUrl)
@@ -135,10 +135,10 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
 
-    public InputStream GetObject(String objectKey){
+    public InputStream GetObject(String objectKey) throws Exception{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         GetObjectRequest request = GetObjectRequest.builder()
                                     .bucket(bucketUrl)
@@ -148,10 +148,10 @@ public class AwsDataObjectHelper implements IDataObject{
         return response;
     }
 
-    public List<String> ListObjects(){
+    public List<String> ListObjects() throws Exception{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         try {
             ListObjectsRequest listObjects = ListObjectsRequest
@@ -162,14 +162,14 @@ public class AwsDataObjectHelper implements IDataObject{
             ListObjectsResponse res = s3Client.listObjects(listObjects);
             return res.contents().stream().map(elem -> elem.key()).collect(Collectors.toList());
         } catch (S3Exception e) {
-            throw new Error("S3 Client refused the request : " + e.getMessage());
+            throw new Exception("S3 Client refused the request : " + e.getMessage());
         }
     }
     
-    public boolean DoesObjectExists(String  objectKey){
+    public boolean DoesObjectExists(String  objectKey) throws Exception{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
                 .bucket(bucketUrl)
@@ -183,9 +183,9 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
 
-    public boolean DoesBucketExists(){
+    public boolean DoesBucketExists() throws Exception{
         if(this.bucketUrl == null){
-            throw new Error("Bucket URL not set...");
+            throw new Exception("Bucket URL not set...");
         }
         HeadBucketRequest headerBucketRequest = HeadBucketRequest.builder()
             .bucket(this.bucketUrl)
@@ -198,7 +198,7 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
 
-    public void CreateBucket(){
+    public void CreateBucket() throws Exception{
         try {
             S3Waiter s3Waiter = s3Client.waiter();
             CreateBucketRequest bucketRequest = CreateBucketRequest.builder()
@@ -214,14 +214,14 @@ public class AwsDataObjectHelper implements IDataObject{
             WaiterResponse<HeadBucketResponse> waiterResponse = s3Waiter.waitUntilBucketExists(bucketRequestWait);
             waiterResponse.matched().response().ifPresent(System.out::println);
         } catch (S3Exception e) {
-            throw new Error("S3 Client refused the request : " + e.getMessage());
+            throw new Exception("S3 Client refused the request : " + e.getMessage());
         }
     }
 
-    public void DeleteBucket(String bucketName){
+    public void DeleteBucket(){
         // To delete a bucket, all the objects in the bucket must be deleted first.
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
+                .bucket(this.bucketUrl)
                 .build();
         ListObjectsV2Response listObjectsV2Response;
 
@@ -229,7 +229,7 @@ public class AwsDataObjectHelper implements IDataObject{
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
             for (S3Object s3Object : listObjectsV2Response.contents()) {
                 DeleteObjectRequest request = DeleteObjectRequest.builder()
-                        .bucket(bucketName)
+                        .bucket(this.bucketUrl)
                         .key(s3Object.key())
                         .build();
                 s3Client.deleteObject(request);
@@ -237,7 +237,7 @@ public class AwsDataObjectHelper implements IDataObject{
         } while (listObjectsV2Response.isTruncated());
         // Then we delete the empty bucket
         DeleteBucketRequest deleteBucketRequest = DeleteBucketRequest.builder()
-                .bucket(bucketName)
+                .bucket(this.bucketUrl)
                 .build();
 
         s3Client.deleteBucket(deleteBucketRequest);
@@ -253,7 +253,7 @@ public class AwsDataObjectHelper implements IDataObject{
         return result;
     }
 
-    public void ResetLoggig(){
+    public void ResetLoggig() throws Exception{
         this.DeleteObject("logs");
     }
 

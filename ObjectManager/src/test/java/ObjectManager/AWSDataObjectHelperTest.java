@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Base64;
@@ -29,7 +28,7 @@ class AWSDataObjectHelperTests {
             "testingNotCreated"
         };
 
-    private static void cleanup() {
+    private static void cleanup() throws Exception {
         for (String i : OBJECT_KEY_LIST) {
             if (_awsClient.DoesObjectExists(i)) {
                 _awsClient.DeleteObject(i);
@@ -38,7 +37,7 @@ class AWSDataObjectHelperTests {
     }
 
     @BeforeAll
-    static void beforeAll() throws IOException {
+    static void beforeAll() throws Exception {
         // Instantiate singleton instance
         _awsClient = new AwsDataObjectHelper();
         // Encode an image in a base64 like string
@@ -64,14 +63,14 @@ class AWSDataObjectHelperTests {
     }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws Exception {
         _awsClient.CreateObject(OBJECT_KEY_LIST[0], java.util.Base64.getDecoder().decode(_base64Img));
     }
 
     @AfterEach
     // TODOR REVIEW To avoid exception (self generated ;) test before deleting
     // RES > Check if object exist before deleting
-    void afterEach() {
+    void afterEach() throws Exception {
         if (_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0])) {
             _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
         }
@@ -81,30 +80,30 @@ class AWSDataObjectHelperTests {
     // TODOR REVIEW To avoid exception (self generated ;) test before closing
     // RES > Explanations as to why there is no test before closin in the README
     // Test and Generation chapter
-    static void tearDown() {
+    static void tearDown() throws Exception {
         // cleanup of all data object used for test still not deleted
         cleanup();
         _awsClient.Close();
     }
 
     @Test
-    void testCreateObject_Created() {
+    void testCreateObject_Created() throws Exception {
         _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
         assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
     }
 
     @Test
-    void testDoesObjectExists_Exist() {
+    void testDoesObjectExists_Exist() throws Exception {
         assertTrue(_awsClient.DoesObjectExists("testing123"));
     }
 
     @Test
-    void testDoesObjectExists_NotExist() {
+    void testDoesObjectExists_NotExist() throws Exception {
         assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[3]));
     }
 
     @Test
-    void testListObjects_ContainElem() {
+    void testListObjects_ContainElem() throws Exception {
         List<String> result = _awsClient.ListObjects();
         boolean found = false;
         for (String object : result) {
@@ -117,7 +116,7 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testGetObject_SameAsCreated() throws IOException {
+    void testGetObject_SameAsCreated() throws Exception {
 
         String objectContent = "coucou tout le monde!";
         _awsClient.CreateObject("testing12345", objectContent.getBytes());
@@ -130,7 +129,7 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testDeleteObject_IsDeleted() {
+    void testDeleteObject_IsDeleted() throws Exception {
         // Delete object
         _awsClient.DeleteObject("testing123");
         assertFalse(_awsClient.DoesObjectExists("testing123"));
