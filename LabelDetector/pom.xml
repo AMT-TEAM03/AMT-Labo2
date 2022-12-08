@@ -8,12 +8,12 @@
     <artifactId>AMT2-DataObject</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.0.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
@@ -89,7 +89,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>ObjectManager.Main</mainClass>
+                            <mainClass>LabelDetector.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -126,7 +126,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.4.0</version>
                 <configuration>
-                    <mainClass>ObjectManager.Main</mainClass>
+                    <mainClass>LabelDetector.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
