@@ -31,6 +31,6 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Publish the Docker image 
       run: |
-              docker build -t AMT/object-manager:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./ObjectManager/
-              docker run AMT/object-manager:latest
-              docker push AMT/object-manager:latest
+              docker build -t ghcr.io/amt/object-manager:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./ObjectManager/
+              docker run ghcr.io/amt/object-manager:latest
+              docker push ghcr.io/amt/object-manager:latest

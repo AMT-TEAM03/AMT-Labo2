@@ -32,6 +32,6 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Publish the Docker image
       run: |
-              docker build -t AMT/label-detector:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./LabelDetector/
-              docker run AMT/label-detector:latest
-              docker push AMT/label-detector:latest
+              docker build -t ghcr.io/amt/label-detector:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./LabelDetector/
+              docker run ghcr.io/amt/label-detector:latest
+              docker push ghcr.io/amt/label-detector:latest
