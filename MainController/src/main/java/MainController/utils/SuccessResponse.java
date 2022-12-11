@@ -1,4 +1,4 @@
-package ObjectManager.utils;
+package MainController.utils;
 
 public class SuccessResponse<T> implements IResponse {
     private boolean success;
