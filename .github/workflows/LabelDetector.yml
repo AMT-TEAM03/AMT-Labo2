@@ -23,5 +23,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build -t label_detector --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./LabelDetector/
+    - name: Login to Github Container Registry
+    uses: docker/login-action@v2
+      with:
+      registry: ghcr.io
+      username: ${{ github.actor }}
+      password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and Publish the Docker image
+      run: |
+              docker build -t AMT/label-detector:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./LabelDetector/
+              docker run AMT/label-detector:latest
+              docker push AMT/label-detector:latest
