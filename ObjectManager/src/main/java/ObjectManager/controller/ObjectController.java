@@ -4,7 +4,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,72 +30,92 @@ public class ObjectController {
     }
 
     @PostMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse CreateObject(
+    public ResponseEntity<IResponse> CreateObject(
         @RequestParam(value="name", defaultValue="None") String name,
         @RequestParam(value="image", defaultValue="None") String objectBase64
     ){
         if(name == "None" || objectBase64 == "None"){
-            return new ErrorResponse("Invalid arguments.");
+            return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            URL imageUrl = objectHelper.CreateObject(name, objectBase64.getBytes());
-            if (imageUrl == null) {
-                return new ErrorResponse("Image creation failed.");
+            if(!objectHelper.DoesBucketExists()){
+                objectHelper.CreateBucket();
             }
+            objectHelper.CreateObject(name, objectBase64.getBytes());
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new SuccessResponse<>("Image Created.");
+        return new ResponseEntity<>(new SuccessResponse<>("Image Created."), HttpStatus.OK);
     }
 
     @GetMapping(value="/object/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse DownloadObject(
+    public ResponseEntity<IResponse> DownloadObject(
         @PathVariable(value="name") String name
     ){
         try{
             InputStream object = objectHelper.GetObject(name);
-            return new SuccessResponse<>(object);
+            return new ResponseEntity<>(new SuccessResponse<>(object), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping(value="/object/{name}")
-    public IResponse DeleteObject(
+    public ResponseEntity<IResponse> DeleteObject(
         @PathVariable(value="name") String name
     ){
         try{
             if(objectHelper.DoesObjectExists(name)){   
                 objectHelper.DeleteObject(name);
             }
-            return new SuccessResponse<>("success");
+            return new ResponseEntity<>(new SuccessResponse<>("success"), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(value="/objects", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IResponse ListObjects(){
+    public ResponseEntity<IResponse> ListObjects(){
         try{
             List<String> response = objectHelper.ListObjects();
             if(response == null){
-                return new ErrorResponse("Empty bucket.");
+                return new ResponseEntity<>(new ErrorResponse("Empty bucket."), HttpStatus.EXPECTATION_FAILED);
             }
-            return new SuccessResponse<>(response);
+            return new ResponseEntity<>(new SuccessResponse<>(response), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping(value="/object/{name}/url")
-    public IResponse GetObjectUrl(
-        @PathVariable(value="name") String name
+    @GetMapping(value="/object/publish")
+    public ResponseEntity<IResponse> GetObjectUrl(
+        @RequestParam(value="name", defaultValue="None") String name
     ){
+        if(name == "None"){
+            return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
+        }
         try{
             URL objectUrl = objectHelper.GetUrl(name);
-            return new SuccessResponse<>(objectUrl.toString());
+            return new ResponseEntity<>(new SuccessResponse<>(objectUrl.toString()), HttpStatus.OK);
         }catch(Exception e){
-            return new ErrorResponse(e.getMessage());
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value="/object/exists")
+    public ResponseEntity<IResponse> DoesObjectExists(
+        @RequestParam(value="name", defaultValue="None") String name
+    ){
+        if(name == "None"){
+            return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
+        }
+        try{
+            if(objectHelper.DoesObjectExists(name)){
+                return new ResponseEntity<>(new SuccessResponse<>(true), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new SuccessResponse<>(false), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

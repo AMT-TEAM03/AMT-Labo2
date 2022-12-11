@@ -4,6 +4,8 @@ public class SuccessResponse<T> implements IResponse {
     private boolean success;
     private T data;
 
+    public SuccessResponse(){}
+
     public SuccessResponse(
         T data
     ){
@@ -17,5 +19,13 @@ public class SuccessResponse<T> implements IResponse {
 
     public T getData(){
         return this.data;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 }
