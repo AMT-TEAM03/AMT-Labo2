@@ -22,12 +22,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Login to Github Container Registry
-    uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    - 
+      name: Login to Github Container Registry
+      uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Publish the Docker image 
       run: |
               docker build -t AMT/object-manager:latest --build-arg aws_access_key_id=$AWS_ACCESS_KEY_ID --build-arg aws_secret_access_key=$AWS_SECRET_ACCESS_KEY ./ObjectManager/
