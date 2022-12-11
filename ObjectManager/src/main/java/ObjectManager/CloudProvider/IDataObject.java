@@ -20,7 +20,7 @@ public interface IDataObject {
      * @param objectKey The key of the file to refer to with the URL
      * @return A public URL to download the file
      */
-    public URL GetUrl(String objectKey) throws Exception;
+    public URL GetUrl(String objectKey, int expirationTime) throws Exception;
 
     /**
      * DeleteObject method, will delete an object on the remote storage

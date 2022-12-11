@@ -23,7 +23,7 @@ class LabelDetectorControllerTests {
 
     @Test
     public void shouldReturnListTimeAndPatterns() throws Exception {
-        mockMvc.perform(get("/v1/execute").param("imageUrlString", imageUrl))
+        mockMvc.perform(get("/v1/analyze").param("imageUrlString", imageUrl))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"time\":")))
                 .andExpect(content().string(containsString("\"name\":")))
@@ -33,7 +33,7 @@ class LabelDetectorControllerTests {
 
     @Test
     public void shouldNotReturnListTimeAndPatterns() throws Exception {
-        mockMvc.perform(get("/v1/execute").param("imageUrlString", "https://www.google.ch"))
+        mockMvc.perform(get("/v1/analyze").param("imageUrlString", "https://www.google.ch"))
                 .andDo(print()).andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Reckognition has encountered an issue")));
     }

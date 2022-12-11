@@ -64,7 +64,7 @@ public class LabelDetectorController {
         }
     }
 
-    @GetMapping(value = "/execute", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/analyze", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> GetLabels(
             @RequestParam(value="imageUrlString", defaultValue="None") String imageUrlString,
             @RequestParam(value="maxPattern", defaultValue= "10") int maxPattern,

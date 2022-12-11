@@ -86,7 +86,7 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
     
-    public URL GetUrl(String objectKey) throws Exception{
+    public URL GetUrl(String objectKey, int expirationTime) throws Exception{
         String bucketUrl = this.bucketUrl;
         S3Presigner presigner = this.presigner;
         if (bucketUrl == null) {
@@ -103,7 +103,7 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
         // Create a GetObjectPresignRequest to specify the signature duration
         GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(60))
+                .signatureDuration(Duration.ofMinutes(expirationTime))
                 .getObjectRequest(getObjectRequest)
                 .build();
 

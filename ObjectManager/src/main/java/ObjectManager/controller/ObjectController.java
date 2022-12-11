@@ -89,13 +89,14 @@ public class ObjectController {
 
     @GetMapping(value="/object/publish")
     public ResponseEntity<IResponse> GetObjectUrl(
-        @RequestParam(value="name", defaultValue="None") String name
+        @RequestParam(value="name", defaultValue="None") String name,
+        @RequestParam(value="expiration-time", defaultValue="90") int expirationTime
     ){
         if(name == "None"){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            URL objectUrl = objectHelper.GetUrl(name);
+            URL objectUrl = objectHelper.GetUrl(name, expirationTime);
             return new ResponseEntity<>(new SuccessResponse<>(objectUrl.toString()), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
