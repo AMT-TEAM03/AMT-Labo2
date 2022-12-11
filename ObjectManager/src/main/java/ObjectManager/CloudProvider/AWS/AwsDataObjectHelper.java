@@ -88,7 +88,7 @@ public class AwsDataObjectHelper implements IDataObject{
     
     public URL GetUrl(String objectKey) throws Exception{
         String bucketUrl = this.bucketUrl;
-        S3Presigner presigner = this.presigner; //AwsCloudClient.getInstance().GetPresigner();
+        S3Presigner presigner = this.presigner;
         if (bucketUrl == null) {
             throw new Exception("Bucket URL not set...");
         }
@@ -115,8 +115,7 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public void DeleteObject(String objectKey) throws Exception{
-        //AwsCloudClient client = AwsCloudClient.getInstance();
-        String bucketUrl = this.bucketUrl; //client.GetBucketUrl();
+        String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
         }
