@@ -3,15 +3,13 @@ package ObjectManager.utils;
 public class SuccessResponse<T> implements IResponse {
     private boolean success;
     private T data;
-    private String type;
+    // private String type;
 
     public SuccessResponse(){}
 
     public SuccessResponse(
         T data
     ){
-        this.type = T.class.toString();
-        System.out.println(this.type);
         this.success = true;
         this.data = data;
     }
