@@ -3,6 +3,7 @@ package LabelDetector.utils;
 public class SuccessResponse<T> implements IResponse {
     private boolean success;
     private T data;
+    // private String type;
 
     public SuccessResponse(
             T data
