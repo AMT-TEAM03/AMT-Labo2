@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,16 +30,16 @@ class AWSDataObjectHelperTests {
     static String _base64Img;
     static boolean includeBucketTests = false;
     static final String[] OBJECT_KEY_LIST = {
-            "testing123",
-            "testing1234",
-            "testing12345",
-            "testingNotCreated"
+            "test/testing123",
+            "test/testing1234",
+            "test/testing12345",
+            "test/testingNotCreated"
         };
 
     private static void cleanup() throws Exception {
         for (String i : OBJECT_KEY_LIST) {
             if (_awsClient.DoesObjectExists(i)) {
-                _awsClient.DeleteObject(i);
+                _awsClient.DeleteObject(i, false);
             }
         }
     }
@@ -92,7 +94,7 @@ class AWSDataObjectHelperTests {
     // RES > Check if object exist before deleting
     void afterEach() throws Exception {
         if (_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0])) {
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[0], false);
         }
     }
 
@@ -107,7 +109,7 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testListObjects_ContainElem() throws Exception {
+    void listObjects_ContainElem() throws Exception {
         List<String> result = _awsClient.ListObjects();
         boolean found = false;
         for (String object : result) {
@@ -120,12 +122,12 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testDoesObjectExist_RootObjectDoesntExist_DoesntExist() throws Exception
+    void doesObjectExist_RootObjectDoesntExist_DoesntExist() throws Exception
         {
             //given
             Assumptions.assumeTrue(includeBucketTests);
             //when
-            _awsClient.DeleteBucket();
+            _awsClient.DeleteBucket(true);
             assertFalse(_awsClient.DoesBucketExists());
             //then
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
@@ -133,7 +135,7 @@ class AWSDataObjectHelperTests {
 
 
     @Test
-    void testUploadObject_RootObjectExistsNewObject_Uploaded() throws Exception
+    void uploadObject_RootObjectExistsNewObject_Uploaded() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesBucketExists());
@@ -142,11 +144,11 @@ class AWSDataObjectHelperTests {
             _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
             //then
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[1]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[1], false);
         }
 
     @Test
-    void testUploadObject_RootObjectExistsObjectAlreadyExists_ThrowException() throws Exception
+    void uploadObject_RootObjectExistsObjectAlreadyExists_ThrowException() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesBucketExists());
@@ -158,11 +160,11 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void testUploadObject_RootObjectDoesntExist_Uploaded() throws Exception
+    void uploadObject_RootObjectDoesntExist_Uploaded() throws Exception
         {
             //given
             Assumptions.assumeTrue(includeBucketTests);
-            _awsClient.DeleteBucket();
+            _awsClient.DeleteBucket(true);
             assertFalse(_awsClient.DoesBucketExists());
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
             //when
@@ -173,7 +175,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void testDownloadObject_ObjectExists_Downloaded() throws Exception
+    void downloadObject_ObjectExists_Downloaded() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
@@ -184,7 +186,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void DownloadObject_ObjectDoesntExist_ThrowException() throws Exception
+    void downloadObject_ObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
@@ -195,7 +197,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void PublishObject_ObjectExists_Published() throws Exception
+    void publishObject_ObjectExists_Published() throws Exception
         {
             //given
             _awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]);
@@ -206,7 +208,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void PublishObject_ObjectDoesntExist_ThrowException() throws Exception
+    void publishObject_ObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
@@ -217,64 +219,81 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void RemoveObject_SingleObjectExists_Removed() throws Exception
+    void removeObject_SingleObjectExists_Removed() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
             //when
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[0], false);
             //then
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
         }
 
     @Test
-    void RemoveObject_SingleObjectDoesntExist_ThrowException() throws Exception
+    void removeObject_SingleObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
             //when
-            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(OBJECT_KEY_LIST[1]);});
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(OBJECT_KEY_LIST[1], false);});
             //then
             assertEquals("Object not found...", thrown.getMessage());
         }
 
-    // @Test
-    // void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
-    //     {
-    //         //given
+    @Test
+    void removeObject_FolderObjectExistWithoutRecursiveOption_ThrowException() throws Exception
+        {
+            //given
+            String folder = "test/";
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            //when
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(folder, false);});
+            //then
+            assertEquals("Object not found...", thrown.getMessage());
+        }
 
-    //         //when
+    @Test
+    void removeObject_FolderObjectExistWithRecursiveOption_Removed() throws Exception
+        {
+            //given
+            String folder = "test/";
+            _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
+            //when
+            _awsClient.DeleteObject(folder, true);
+            //then
+            for(String objectKey : OBJECT_KEY_LIST){
+                assertFalse(_awsClient.DoesObjectExists(objectKey));
+            }
+        }
 
-    //         //then
-    //     }
+    @Test
+    void RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException() throws Exception
+        {
+            //given
+            Assumptions.assumeTrue(includeBucketTests); 
+            assertTrue(_awsClient.DoesBucketExists());
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            //when
+            OperationNotSupportedException thrown = assertThrows(OperationNotSupportedException.class, () -> {
+                _awsClient.DeleteBucket(false);
+            });
+            //then
+            assertEquals("Bucket is not empty...", thrown.getMessage());
+        }
 
-    // @Test
-    // void RemoveObject_FolderObjectExistWithRecursiveOption_Removed()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
+    @Test
+    void RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed() throws Exception
+        {
+            //given
+            Assumptions.assumeTrue(includeBucketTests);
+            _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
+            //when
+            _awsClient.DeleteBucket(true);
+            //then
+            assertFalse(_awsClient.DoesBucketExists());
+        }
 }

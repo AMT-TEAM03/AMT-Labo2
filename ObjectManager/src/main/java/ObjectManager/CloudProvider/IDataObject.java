@@ -27,7 +27,7 @@ public interface IDataObject {
      * 
      * @param objectKey The key of the file to delete
      */
-    public void DeleteObject(String objectKey) throws Exception;
+    public void DeleteObject(String objectKey, boolean recursive) throws Exception;
 
     /**
      * GetObject method, will download an object from the remote storage
