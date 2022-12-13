@@ -254,25 +254,27 @@ class AWSDataObjectHelperTests {
             assertEquals("Object not found...", thrown.getMessage());
         }
 
-    // @Test
-    // void RemoveObject_SingleObjectExists_Removed()
-    //     {
-    //         //given
+    @Test
+    void RemoveObject_SingleObjectExists_Removed() throws Exception
+        {
+            //given
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            //when
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
+            //then
+            assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+        }
 
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_SingleObjectDoesntExist_ThrowException()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
+    @Test
+    void RemoveObject_SingleObjectDoesntExist_ThrowException() throws Exception
+        {
+            //given
+            assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
+            //when
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(OBJECT_KEY_LIST[1]);});
+            //then
+            assertEquals("Object not found...", thrown.getMessage());
+        }
 
     // @Test
     // void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()

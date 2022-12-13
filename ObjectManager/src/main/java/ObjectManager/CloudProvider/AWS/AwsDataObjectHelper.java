@@ -125,6 +125,9 @@ public class AwsDataObjectHelper implements IDataObject{
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
         }
+        if(!DoesObjectExists(objectKey)){
+            throw new IllegalArgumentException("Object not found...");
+        }
         DeleteObjectRequest delReq = DeleteObjectRequest.builder()
                         .bucket(bucketUrl)
                         .key(objectKey)
