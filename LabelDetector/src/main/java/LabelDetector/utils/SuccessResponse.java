@@ -1,4 +1,4 @@
-package LabelDetector.controller.utils;
+package LabelDetector.utils;
 
 public class SuccessResponse<T> implements IResponse {
     private boolean success;

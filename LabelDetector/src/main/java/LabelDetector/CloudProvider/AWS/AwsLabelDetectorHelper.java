@@ -15,30 +15,12 @@ import java.util.*;
 
 public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
     private RekognitionClient rekClient;
-    private float confidence_threshold = 90;
-    private int maxPattern = 10;
 
     public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder().build();
     }
 
-    public void SetConfidenceThreshold(float confidence){
-        this.confidence_threshold = confidence;
-    }
-
-    public float GetConfidenceThreshold(){
-        return this.confidence_threshold;
-    }
-
-    public void SetMaxPattern(int maxPattern){
-        this.maxPattern = maxPattern;
-    }
-
-    public int GetMaxPattern(){
-        return this.maxPattern;
-    }
-
-    public AwsReckognitionResult Execute(URL imageUrl) throws IllegalArgumentException, IOException {
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern, float confidence_threshold) throws IllegalArgumentException, IOException {
         AwsReckognitionResult result = new AwsReckognitionResult();
         List<AwsPatternDetected> listPattern = new ArrayList<>();
         Gson g = new Gson();
@@ -49,8 +31,9 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
                     .image(Image.builder().bytes(SdkBytes.fromByteArray(IoUtils.toByteArray(is))).build())
-                    .maxLabels(GetMaxPattern()).minConfidence(GetConfidenceThreshold())
+                    .maxLabels(maxPattern).minConfidence(confidence_threshold)
                     .build();
+
             // Compute time for loggin
             long startTime = System.currentTimeMillis();
             DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
@@ -74,4 +57,19 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
         return result;
     }
 
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern) throws IllegalArgumentException, IOException{
+        float confidence_threshold = 90;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
+
+    public AwsReckognitionResult Analyze(URL imageUrl, float confidence_threshold) throws IllegalArgumentException, IOException{
+        int maxPattern = 10;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
+
+    public AwsReckognitionResult Analyze(URL imageUrl) throws IllegalArgumentException, IOException{
+        int maxPattern = 10;
+        float confidence_threshold = 90;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
 }

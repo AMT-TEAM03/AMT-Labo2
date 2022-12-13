@@ -15,5 +15,12 @@ public interface ILabelDetector<T> {
      * @exception IllegalArgumentException
      * @exception IOException
      */
-    public AwsReckognitionResult Execute(URL imageUrl) throws IllegalArgumentException, IOException;
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern, float confidence_threshold) throws IllegalArgumentException, IOException;
+
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern) throws IllegalArgumentException, IOException;
+
+    public AwsReckognitionResult Analyze(URL imageUrl, float confidence_threshold) throws IllegalArgumentException, IOException;
+
+    public AwsReckognitionResult Analyze(URL imageUrl) throws IllegalArgumentException, IOException;
+
 }
