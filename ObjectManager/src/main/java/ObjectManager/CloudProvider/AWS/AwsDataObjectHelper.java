@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -15,8 +16,10 @@ import java.util.stream.Collectors;
 import ObjectManager.CloudProvider.IDataObject;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
@@ -30,6 +33,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -120,26 +124,61 @@ public class AwsDataObjectHelper implements IDataObject{
         return presignedGetObjectRequest.url();
     }
 
-    public void DeleteObject(String objectKey) throws Exception{
+    public void DeleteObject(String objectKey, boolean recursive) throws Exception{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
         }
-        if(!DoesObjectExists(objectKey)){
-            throw new IllegalArgumentException("Object not found...");
-        }
-        DeleteObjectRequest delReq = DeleteObjectRequest.builder()
-                        .bucket(bucketUrl)
-                        .key(objectKey)
-                        .build();
-        s3Client.deleteObject(delReq);
-        // Remove the label detection cache if exists 
-        if(this.DoesObjectExists(objectKey + "_result")){
-            delReq = DeleteObjectRequest.builder()
+        if(!recursive){
+            if (!DoesObjectExists(objectKey)) {
+                throw new IllegalArgumentException("Object not found...");
+            }
+            DeleteObjectRequest delReq = DeleteObjectRequest.builder()
+                    .bucket(bucketUrl)
+                    .key(objectKey)
+                    .build();
+            s3Client.deleteObject(delReq);
+            // Remove the label detection cache if exists
+            if (this.DoesObjectExists(objectKey + "_result")) {
+                delReq = DeleteObjectRequest.builder()
                         .bucket(bucketUrl)
                         .key(objectKey + "_result")
                         .build();
-            s3Client.deleteObject(delReq);
+                s3Client.deleteObject(delReq);
+            }
+        }else{
+            // Request to find recursively the objects
+            ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder()
+                .bucket(this.bucketUrl)
+                .prefix(objectKey)
+                .build();
+            // Objects to delete
+            ListObjectsResponse objectsResponse = s3Client.listObjects(listObjectsRequest);
+            while (true) {
+                ArrayList<ObjectIdentifier> objects = new ArrayList<>();
+                for (Iterator<?> iterator = objectsResponse.contents().iterator(); iterator.hasNext();) {
+                    S3Object s3Object = (S3Object) iterator.next();
+                    objects.add(
+                            ObjectIdentifier.builder()
+                                    .key(s3Object.key())
+                                    .build());
+                }
+                
+                s3Client.deleteObjects(
+                        DeleteObjectsRequest.builder()
+                                .bucket(this.bucketUrl)
+                                .delete(
+                                        Delete.builder()
+                                                .objects(objects)
+                                                .build())
+                                .build());
+
+                if (objectsResponse.isTruncated()) {
+                    objectsResponse = s3Client.listObjects(listObjectsRequest);
+                    continue;
+                }
+                break;
+            };
         }
     }
 
@@ -260,7 +299,7 @@ public class AwsDataObjectHelper implements IDataObject{
     }
 
     public void ResetLoggig() throws Exception{
-        this.DeleteObject("logs");
+        this.DeleteObject("logs", false);
     }
 
     public void Close(){

@@ -64,7 +64,7 @@ public class ObjectController {
     ){
         try{
             if(objectHelper.DoesObjectExists(name)){   
-                objectHelper.DeleteObject(name);
+                objectHelper.DeleteObject(name, false);
             }
             return new ResponseEntity<>(new SuccessResponse<>("success"), HttpStatus.OK);
         }catch(Exception e){

@@ -28,16 +28,16 @@ class AWSDataObjectHelperTests {
     static String _base64Img;
     static boolean includeBucketTests = false;
     static final String[] OBJECT_KEY_LIST = {
-            "testing123",
-            "testing1234",
-            "testing12345",
-            "testingNotCreated"
+            "test/testing123",
+            "test/testing1234",
+            "test/testing12345",
+            "test/testingNotCreated"
         };
 
     private static void cleanup() throws Exception {
         for (String i : OBJECT_KEY_LIST) {
             if (_awsClient.DoesObjectExists(i)) {
-                _awsClient.DeleteObject(i);
+                _awsClient.DeleteObject(i, false);
             }
         }
     }
@@ -92,7 +92,7 @@ class AWSDataObjectHelperTests {
     // RES > Check if object exist before deleting
     void afterEach() throws Exception {
         if (_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0])) {
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[0], false);
         }
     }
 
@@ -142,7 +142,7 @@ class AWSDataObjectHelperTests {
             _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
             //then
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[1]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[1], false);
         }
 
     @Test
@@ -222,7 +222,7 @@ class AWSDataObjectHelperTests {
             //given
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
             //when
-            _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
+            _awsClient.DeleteObject(OBJECT_KEY_LIST[0], false);
             //then
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
         }
@@ -233,30 +233,38 @@ class AWSDataObjectHelperTests {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
             //when
-            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(OBJECT_KEY_LIST[1]);});
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(OBJECT_KEY_LIST[1], false);});
             //then
             assertEquals("Object not found...", thrown.getMessage());
         }
 
-    // @Test
-    // void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
-    //     {
-    //         //given
+    @Test
+    void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException() throws Exception
+        {
+            //given
+            String folder = "test/";
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            //when
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {_awsClient.DeleteObject(folder, false);});
+            //then
+            assertEquals("Object not found...", thrown.getMessage());
+        }
 
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_FolderObjectExistWithRecursiveOption_Removed()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
+    @Test
+    void RemoveObject_FolderObjectExistWithRecursiveOption_Removed() throws Exception
+        {
+            //given
+            String folder = "test/";
+            _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
+            //when
+            _awsClient.DeleteObject(folder, true);
+            //then
+            for(String objectKey : OBJECT_KEY_LIST){
+                assertFalse(_awsClient.DoesObjectExists(objectKey));
+            }
+        }
 
     // @Test
     // void RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException()
