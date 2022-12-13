@@ -107,7 +107,7 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testListObjects_ContainElem() throws Exception {
+    void listObjects_ContainElem() throws Exception {
         List<String> result = _awsClient.ListObjects();
         boolean found = false;
         for (String object : result) {
@@ -120,7 +120,7 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testDoesObjectExist_RootObjectDoesntExist_DoesntExist() throws Exception
+    void doesObjectExist_RootObjectDoesntExist_DoesntExist() throws Exception
         {
             //given
             Assumptions.assumeTrue(includeBucketTests);
@@ -133,7 +133,7 @@ class AWSDataObjectHelperTests {
 
 
     @Test
-    void testUploadObject_RootObjectExistsNewObject_Uploaded() throws Exception
+    void uploadObject_RootObjectExistsNewObject_Uploaded() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesBucketExists());
@@ -146,7 +146,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void testUploadObject_RootObjectExistsObjectAlreadyExists_ThrowException() throws Exception
+    void uploadObject_RootObjectExistsObjectAlreadyExists_ThrowException() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesBucketExists());
@@ -158,7 +158,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void testUploadObject_RootObjectDoesntExist_Uploaded() throws Exception
+    void uploadObject_RootObjectDoesntExist_Uploaded() throws Exception
         {
             //given
             Assumptions.assumeTrue(includeBucketTests);
@@ -173,7 +173,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void testDownloadObject_ObjectExists_Downloaded() throws Exception
+    void downloadObject_ObjectExists_Downloaded() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
@@ -184,7 +184,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void DownloadObject_ObjectDoesntExist_ThrowException() throws Exception
+    void downloadObject_ObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
@@ -195,7 +195,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void PublishObject_ObjectExists_Published() throws Exception
+    void publishObject_ObjectExists_Published() throws Exception
         {
             //given
             _awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]);
@@ -206,7 +206,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void PublishObject_ObjectDoesntExist_ThrowException() throws Exception
+    void publishObject_ObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
@@ -217,7 +217,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void RemoveObject_SingleObjectExists_Removed() throws Exception
+    void removeObject_SingleObjectExists_Removed() throws Exception
         {
             //given
             assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
@@ -228,7 +228,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void RemoveObject_SingleObjectDoesntExist_ThrowException() throws Exception
+    void removeObject_SingleObjectDoesntExist_ThrowException() throws Exception
         {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
@@ -239,7 +239,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException() throws Exception
+    void removeObject_FolderObjectExistWithoutRecursiveOption_ThrowException() throws Exception
         {
             //given
             String folder = "test/";
@@ -251,7 +251,7 @@ class AWSDataObjectHelperTests {
         }
 
     @Test
-    void RemoveObject_FolderObjectExistWithRecursiveOption_Removed() throws Exception
+    void removeObject_FolderObjectExistWithRecursiveOption_Removed() throws Exception
         {
             //given
             String folder = "test/";
