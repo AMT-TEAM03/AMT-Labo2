@@ -15,18 +15,18 @@ import java.util.*;
 
 public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
     private RekognitionClient rekClient;
-    private int confidence_threshold = 90;
+    private float confidence_threshold = 90;
     private int maxPattern = 10;
 
     public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder().build();
     }
 
-    public void SetConfidenceThreshold(int confidence){
+    public void SetConfidenceThreshold(float confidence){
         this.confidence_threshold = confidence;
     }
 
-    public int GetConfidenceThreshold(){
+    public float GetConfidenceThreshold(){
         return this.confidence_threshold;
     }
 
@@ -49,7 +49,7 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
                     .image(Image.builder().bytes(SdkBytes.fromByteArray(IoUtils.toByteArray(is))).build())
-                    .maxLabels(GetMaxPattern())
+                    .maxLabels(GetMaxPattern()).minConfidence(GetConfidenceThreshold())
                     .build();
             // Compute time for loggin
             long startTime = System.currentTimeMillis();
@@ -67,15 +67,8 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             throw new IOException("URL not recognized" + e.getMessage());
         }
         // Parse patternList
-        int patternDetected = 0;
         for (Label label : labels) {
-            if (label.confidence() >= confidence_threshold) {
-                listPattern.add(new AwsPatternDetected(label.name(), label.confidence()));
-                patternDetected++;
-                if (patternDetected > maxPattern) {
-                    break;
-                }
-            }
+            listPattern.add(new AwsPatternDetected(label.name(), label.confidence()));
         }
         result.setPatternDetected(listPattern);
         return result;

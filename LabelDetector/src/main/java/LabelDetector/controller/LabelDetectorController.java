@@ -24,7 +24,7 @@ public class LabelDetectorController {
 
     @PutMapping(value = "/confidence", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> SetConfidence(
-            @RequestParam(value="confidence", defaultValue="90") int confidenceLvl
+            @RequestParam(value="confidence", defaultValue="90") float confidenceLvl
     ){
         try{
             detector.SetConfidenceThreshold(confidenceLvl);
@@ -68,7 +68,7 @@ public class LabelDetectorController {
     public ResponseEntity<IResponse> GetLabels(
             @RequestParam(value="imageUrlString", defaultValue="None") String imageUrlString,
             @RequestParam(value="maxPattern", defaultValue= "10") int maxPattern,
-            @RequestParam(value="minConfidence", defaultValue="90") int minConfidence
+            @RequestParam(value="minConfidence", defaultValue="90") float minConfidence
     ){
         try {
             URL imageUrl = new URL(imageUrlString);
