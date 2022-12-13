@@ -249,10 +249,9 @@ class AWSDataObjectHelperTests {
             //given
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
             //when
-            Exception thrown = assertThrows(Exception.class, () -> {System.out.println(_awsClient.GetUrl(OBJECT_KEY_LIST[1]));});
+            IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {System.out.println(_awsClient.GetUrl(OBJECT_KEY_LIST[1]));});
             //then
-            System.out.println(thrown.getMessage());
-            assertEquals("whatever", thrown.getMessage());
+            assertEquals("Object not found...", thrown.getMessage());
         }
 
     // @Test

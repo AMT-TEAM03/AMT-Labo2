@@ -98,6 +98,9 @@ public class AwsDataObjectHelper implements IDataObject{
         if (presigner == null) {
             throw new Exception("No Presigner to generate URL...");
         }
+        if(!DoesObjectExists(objectKey)){
+            throw new IllegalArgumentException("Object not found...");
+        }
         // Generate URL valid for 60 minutes
         // Create a GetObjectRequest to be pre-signed
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
