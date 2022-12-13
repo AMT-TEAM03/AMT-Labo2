@@ -276,15 +276,15 @@ class AWSDataObjectHelperTests {
             assertEquals("Object not found...", thrown.getMessage());
         }
 
-    // @Test
-    // void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
-    //     {
-    //         //given
+    @Test
+    void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
+        {
+            //given
 
-    //         //when
+            //when
 
-    //         //then
-    //     }
+            //then
+        }
 
     // @Test
     // void RemoveObject_FolderObjectExistWithRecursiveOption_Removed()
@@ -309,15 +309,6 @@ class AWSDataObjectHelperTests {
     // @Test
     // void RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed()
     //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_ObjectNotExists_ThrowException(){
     //         //given
 
     //         //when
