@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import ObjectManager.CloudProvider.IDataObject;
 import ObjectManager.CloudProvider.AWS.AwsDataObjectHelper;
 import ObjectManager.utils.ErrorResponse;
 import ObjectManager.utils.IResponse;
@@ -23,7 +24,7 @@ import ObjectManager.utils.SuccessResponse;
 @RestController
 @RequestMapping("/v1")
 public class ObjectController {
-    private AwsDataObjectHelper objectHelper;
+    private IDataObject objectHelper;
 
     public ObjectController(){
         objectHelper = new AwsDataObjectHelper();
@@ -38,9 +39,6 @@ public class ObjectController {
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            if(!objectHelper.DoesBucketExists()){
-                objectHelper.CreateBucket();
-            }
             objectHelper.CreateObject(name, objectBase64.getBytes());
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
