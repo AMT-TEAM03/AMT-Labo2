@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -125,7 +127,7 @@ class AWSDataObjectHelperTests {
             //given
             Assumptions.assumeTrue(includeBucketTests);
             //when
-            _awsClient.DeleteBucket();
+            _awsClient.DeleteBucket(true);
             assertFalse(_awsClient.DoesBucketExists());
             //then
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
@@ -162,7 +164,7 @@ class AWSDataObjectHelperTests {
         {
             //given
             Assumptions.assumeTrue(includeBucketTests);
-            _awsClient.DeleteBucket();
+            _awsClient.DeleteBucket(true);
             assertFalse(_awsClient.DoesBucketExists());
             assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
             //when
@@ -266,23 +268,32 @@ class AWSDataObjectHelperTests {
             }
         }
 
-    // @Test
-    // void RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException()
-    //     {
-    //         //given
+    @Test
+    void RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException() throws Exception
+        {
+            //given
+            Assumptions.assumeTrue(includeBucketTests); 
+            assertTrue(_awsClient.DoesBucketExists());
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            //when
+            OperationNotSupportedException thrown = assertThrows(OperationNotSupportedException.class, () -> {
+                _awsClient.DeleteBucket(false);
+            });
+            //then
+            assertEquals("Bucket is not empty...", thrown.getMessage());
+        }
 
-    //         //when
-
-    //         //then
-    //     }
-
-    // @Test
-    // void RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed()
-    //     {
-    //         //given
-
-    //         //when
-
-    //         //then
-    //     }
+    @Test
+    void RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed() throws Exception
+        {
+            //given
+            Assumptions.assumeTrue(includeBucketTests);
+            _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
+            assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
+            //when
+            _awsClient.DeleteBucket(true);
+            //then
+            assertFalse(_awsClient.DoesBucketExists());
+        }
 }

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.naming.OperationNotSupportedException;
+
 import ObjectManager.CloudProvider.IDataObject;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -265,7 +267,7 @@ public class AwsDataObjectHelper implements IDataObject{
         }
     }
 
-    public void DeleteBucket(){
+    public void DeleteBucket(boolean recursive) throws OperationNotSupportedException{
         // To delete a bucket, all the objects in the bucket must be deleted first.
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(this.bucketUrl)
@@ -274,6 +276,9 @@ public class AwsDataObjectHelper implements IDataObject{
 
         do {
             listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+            if(listObjectsV2Response.contents().size() > 0 && !recursive){
+                throw new OperationNotSupportedException("Bucket is not empty...");
+            }
             for (S3Object s3Object : listObjectsV2Response.contents()) {
                 DeleteObjectRequest request = DeleteObjectRequest.builder()
                         .bucket(this.bucketUrl)
