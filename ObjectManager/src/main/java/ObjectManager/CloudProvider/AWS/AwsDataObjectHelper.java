@@ -72,6 +72,9 @@ public class AwsDataObjectHelper implements IDataObject{
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
         }
+        if(!DoesBucketExists()){
+            CreateBucket();
+        }
         if(DoesObjectExists(objectKey)){
             throw new Exception("File already exists in the bucket...");
         }
@@ -94,6 +97,9 @@ public class AwsDataObjectHelper implements IDataObject{
         }
         if (presigner == null) {
             throw new Exception("No Presigner to generate URL...");
+        }
+        if(!DoesObjectExists(objectKey)){
+            throw new IllegalArgumentException("Object not found...");
         }
         // Generate URL valid for 60 minutes
         // Create a GetObjectRequest to be pre-signed
@@ -118,6 +124,9 @@ public class AwsDataObjectHelper implements IDataObject{
         String bucketUrl = this.bucketUrl;
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
+        }
+        if(!DoesObjectExists(objectKey)){
+            throw new IllegalArgumentException("Object not found...");
         }
         DeleteObjectRequest delReq = DeleteObjectRequest.builder()
                         .bucket(bucketUrl)
@@ -240,8 +249,6 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
 
         s3Client.deleteBucket(deleteBucketRequest);
-        s3Client.close();
-
     }
 
     public List<String> ListBuckets(){

@@ -97,7 +97,6 @@ class ObjectControllerTest {
         assertTrue(response.getData().contains(OBJECT_KEY_LIST[0]));
     }
 
-    // DoesObjectExist_RootObjectExists_Exists
     @Test
     public void DoesObjectExist_RootObjectExists_Exists() throws Exception{
         MvcResult result = mockMvc.perform(get("/v1/object/exists?name=" + OBJECT_KEY_LIST[0])).andReturn();
@@ -107,17 +106,6 @@ class ObjectControllerTest {
         assertTrue(response.getData());
     }
 
-    // DoesObjectExist_RootObjectDoesntExist_DoesntExist
-    // @Test
-    // public void DoesObjectExists_RootObjectDoesntExists_DoesntExist(){
-    //     _awsClient.DeleteBucket();
-    //     MvcResult result = mockMvc.perform(get("/v1/object/exists?name=" + OBJECT_KEY_LIST[0])).andReturn();
-    //     assertTrue(result.getResponse().getStatus() == HttpStatus.OK.value());
-    //     SuccessResponse<Boolean> response = mapper.readValue(result.getResponse().getContentAsByteArray(),
-    //             SuccessResponse.class);
-    //     assertTrue(response.getData());
-    // }
-    // DoesObjectExist_RootObjectAndObjectExist_Exists
     @Test
     public void DoesObjectExist_RootObjectAndObjectExist_Exists() throws Exception {
         MvcResult result = mockMvc.perform(get("/v1/object/exists?name=" + OBJECT_KEY_LIST[0])).andReturn();
@@ -126,30 +114,4 @@ class ObjectControllerTest {
                 SuccessResponse.class);
         assertTrue(response.getData());
     }
-    // DoesObjectExist_RootObjectExistObjectDoesntExist_DoesntExist
-    // UploadObject_RootObjectExistsNewObject_Uploaded
-    // UploadObject_RootObjectExistsObjectAlreadyExists_ThrowException
-    // UploadObject_RootObjectDoesntExist_Uploaded
-    // DownloadObject_ObjectExists_Downloaded
-    // DownloadObject_ObjectDoesntExist_ThrowException
-    // PublishObject_ObjectExists_Published
-    // PublishObject_ObjectDoesntExist_ThrowException
-    // RemoveObject_SingleObjectExists_Removed
-    // RemoveObject_SingleObjectDoesntExist_ThrowException
-    // RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException
-    // RemoveObject_FolderObjectExistWithRecursiveOption_Removed
-    // RemoveObject_RootObjectNotEmptyWithoutRecursiveOption_ThrowException
-    // RemoveObject_RootObjectNotEmptyWithRecursiveOption_Removed
-    // RemoveObject_ObjectNotExists_ThrowException
-
-    // @Test
-    // public void shouldCreateObject() throws Exception {
-    //     mockMvc.perform(post("/v1/object")).andDo(print()).andExpect(status().isOk());
-    //             // .andExpect(content().string(containsString("Hello, World")));
-    // }
-    // @Test
-    // public void shouldDeleteObject() throws Exception {
-    //     mockMvc.perform(delete("/v1/object")).andDo(print()).andExpect(status().isOk());
-    //             // .andExpect(content().string(containsString("Hello, World")));
-    // }
 }
