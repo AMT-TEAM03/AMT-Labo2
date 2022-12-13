@@ -1,4 +1,4 @@
-package LabelDetector.utils;
+package LabelDetector.controller.utils;
 
 
 public class ErrorResponse implements IResponse {

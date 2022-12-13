@@ -2,9 +2,9 @@ package LabelDetector.controller;
 
 import LabelDetector.CloudProvider.AWS.AwsLabelDetectorHelper;
 import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
-import LabelDetector.utils.ErrorResponse;
-import LabelDetector.utils.IResponse;
-import LabelDetector.utils.SuccessResponse;
+import LabelDetector.controller.utils.ErrorResponse;
+import LabelDetector.controller.utils.IResponse;
+import LabelDetector.controller.utils.SuccessResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +64,7 @@ public class LabelDetectorController {
         }
     }
 
-    @GetMapping(value = "/execute", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/analyze", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> GetLabels(
             @RequestParam(value="imageUrlString", defaultValue="None") String imageUrlString,
             @RequestParam(value="maxPattern", defaultValue= "10") int maxPattern,

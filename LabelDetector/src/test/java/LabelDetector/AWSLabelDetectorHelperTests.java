@@ -4,8 +4,6 @@ import LabelDetector.CloudProvider.AWS.AwsLabelDetectorHelper;
 import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
 import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.function.Executable;
-import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 
 import java.io.*;
 import java.net.URL;
@@ -22,13 +20,6 @@ class AWSLabelDetectorHelperTests {
         _imageUrl = new URL("https://www.camerahouse.com.au/blog/wp-content/uploads/2020/01/street-on-cloudy-day.jpg");
         _wrongUrl = new URL("https://www.google.ch");
     }
-
-    /*
-     * Analyze_ParametersDefaultValues_ContentFromAwsRekognitionWithoutFilter
-     * Analyze_MaxLabelsEqual20_ContentFromAwsRekognitionFilterApplied
-     * Analyze_MinConfidenceLevelEqual70_ContentFromAwsRekognitionFilterApplied
-     * Analyse_MaxLabel30AndConfidenceLevel50_ContentFromAwsRekognitionFilterApplied
-     */
 
     @Test
     void Analyze_ParametersDefaultValues_ContentFromAwsRekognitionWithoutFilter() throws IOException {
