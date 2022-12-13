@@ -107,23 +107,6 @@ class AWSDataObjectHelperTests {
     }
 
     @Test
-    void testCreateObject_Created() throws Exception {
-        _awsClient.CreateObject(OBJECT_KEY_LIST[1], java.util.Base64.getDecoder().decode(_base64Img));
-        assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[1]));
-        _awsClient.DeleteObject(OBJECT_KEY_LIST[1]);
-    }
-
-    @Test
-    void testDoesObjectExists_Exist() throws Exception {
-        assertTrue(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
-    }
-
-    @Test
-    void testDoesObjectExists_NotExist() throws Exception {
-        assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[3]));
-    }
-
-    @Test
     void testListObjects_ContainElem() throws Exception {
         List<String> result = _awsClient.ListObjects();
         boolean found = false;
@@ -134,27 +117,6 @@ class AWSDataObjectHelperTests {
             }
         }
         assertTrue(found);
-    }
-
-    @Test
-    void testGetObject_SameAsCreated() throws Exception {
-
-        String objectContent = "coucou tout le monde!";
-        _awsClient.CreateObject(OBJECT_KEY_LIST[2], objectContent.getBytes());
-        InputStream objectStream = _awsClient.GetObject(OBJECT_KEY_LIST[2]);
-        _awsClient.DeleteObject(OBJECT_KEY_LIST[2]);
-        String result = new BufferedReader(new InputStreamReader(objectStream))
-                .lines().collect(Collectors.joining("\n"));
-        objectStream.close();
-        assertEquals(objectContent, new String(result));
-    }
-
-    @Test
-    void testDeleteObject_IsDeleted() throws Exception {
-        // Delete object
-        _awsClient.DeleteObject(OBJECT_KEY_LIST[0]);
-        assertFalse(_awsClient.DoesObjectExists(OBJECT_KEY_LIST[0]));
-        ;
     }
 
     @Test
@@ -276,15 +238,15 @@ class AWSDataObjectHelperTests {
             assertEquals("Object not found...", thrown.getMessage());
         }
 
-    @Test
-    void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
-        {
-            //given
+    // @Test
+    // void RemoveObject_FolderObjectExistWithoutRecursiveOption_ThrowException()
+    //     {
+    //         //given
 
-            //when
+    //         //when
 
-            //then
-        }
+    //         //then
+    //     }
 
     // @Test
     // void RemoveObject_FolderObjectExistWithRecursiveOption_Removed()
