@@ -72,6 +72,9 @@ public class AwsDataObjectHelper implements IDataObject{
         if(bucketUrl == null){
             throw new Exception("Bucket URL not set...");
         }
+        if(!DoesBucketExists()){
+            CreateBucket();
+        }
         if(DoesObjectExists(objectKey)){
             throw new Exception("File already exists in the bucket...");
         }
@@ -240,8 +243,6 @@ public class AwsDataObjectHelper implements IDataObject{
                 .build();
 
         s3Client.deleteBucket(deleteBucketRequest);
-        s3Client.close();
-
     }
 
     public List<String> ListBuckets(){
