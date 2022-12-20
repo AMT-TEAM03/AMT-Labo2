@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.core.Base64Variants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ObjectManager.CloudProvider.AWS.AwsDataObjectHelper;
 import ObjectManager.controller.request.ObjectRequest;
 import ObjectManager.utils.SuccessResponse;
 
