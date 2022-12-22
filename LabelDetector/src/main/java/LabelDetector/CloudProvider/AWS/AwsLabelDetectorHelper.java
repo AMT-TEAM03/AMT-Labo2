@@ -3,7 +3,6 @@ package LabelDetector.CloudProvider.AWS;
 import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
 import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 import LabelDetector.CloudProvider.ILabelDetector;
-import com.google.gson.Gson;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.*;
@@ -23,7 +22,6 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
     public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern, float confidence_threshold) throws IllegalArgumentException, IOException {
         AwsReckognitionResult result = new AwsReckognitionResult();
         List<AwsPatternDetected> listPattern = new ArrayList<>();
-        Gson g = new Gson();
         // Detect the labels
         List<Label> labels = new ArrayList<>();
         try {
