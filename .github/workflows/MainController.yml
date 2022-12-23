@@ -39,6 +39,7 @@ jobs:
         check-name: 'ObjectManager build'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wait-interval: 10
+        verbose: true
     - name: Run microservices LabelDetector and ObjectManager
       run: docker run -p 9090:9090 -d ghcr.io/amt-team03/object-manager:latest; docker run -p 8787:8787 -d ghcr.io/amt-team03/label-detector:latest
     - name: Build with Maven
