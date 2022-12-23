@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import MainController.API;
-
-
 public class Main {
     public static void main(String[] args) throws IOException {
         startIntegrationTests(System.in, args);

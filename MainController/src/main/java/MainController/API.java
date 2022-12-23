@@ -49,11 +49,9 @@ public class API {
         analyzeConfig.put("imageUrl", imageUrl);
         analyzeConfig.put("maxPattern", 10);
         analyzeConfig.put("minConfidence", 90);
-        String jsonBodyAnalyze = objectMapper.writeValueAsString(analyzeConfig);
 
-        HttpResponse<JsonNode> analyzeResult = Unirest.post(urlLabelApi + "/analyze")
+        HttpResponse<JsonNode> analyzeResult = Unirest.get(urlLabelApi + "/analyze?imageUrl=" + imageUrl)
                 .header("Content-Type", "application/json")
-                .body(jsonBodyAnalyze)
                 .asJson();
 
         return analyzeResult;
