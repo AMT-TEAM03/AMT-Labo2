@@ -1,0 +1,7 @@
+{
+    "label": {
+        "imageUrl": "",
+        "maxPattern": 10,
+        "minConfidence": 90.0
+    }
+}

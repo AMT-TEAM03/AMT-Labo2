@@ -4,18 +4,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import ObjectManager.CloudProvider.AWS.AwsDataObjectHelper;
+import ObjectManager.controller.request.ObjectRequest;
+import ObjectManager.dto.ObjectDTO;
+import ObjectManager.dto.mapper.ObjectDTOMapper;
+import ObjectManager.service.ObjectService;
 import ObjectManager.utils.ErrorResponse;
 import ObjectManager.utils.IResponse;
 import ObjectManager.utils.SuccessResponse;
@@ -23,52 +21,49 @@ import ObjectManager.utils.SuccessResponse;
 @RestController
 @RequestMapping("/v1")
 public class ObjectController {
-    private AwsDataObjectHelper objectHelper;
-
-    public ObjectController(){
-        objectHelper = new AwsDataObjectHelper();
-    }
+    @Autowired
+    private ObjectService service;
 
     @PostMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> CreateObject(
-        @RequestParam(value="name", defaultValue="None") String name,
-        @RequestParam(value="image", defaultValue="None") String objectBase64
+            @RequestBody ObjectRequest request
     ){
-        if(name == "None" || objectBase64 == "None"){
+        ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+        if(dto.getName() == null || dto.getImage() == null){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            if(!objectHelper.DoesBucketExists()){
-                objectHelper.CreateBucket();
-            }
-            objectHelper.CreateObject(name, objectBase64.getBytes());
+            service.CreateObject(dto);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(new SuccessResponse<>("Image Created."), HttpStatus.OK);
     }
 
-    @GetMapping(value="/object/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> DownloadObject(
-        @PathVariable(value="name") String name
+            @RequestParam(value="name", defaultValue="None") String name
     ){
+        ObjectRequest tmp = new ObjectRequest().setName(name);
         try{
-            InputStream object = objectHelper.GetObject(name);
+            ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
+            InputStream object = service.DownloadObject(dto);
             return new ResponseEntity<>(new SuccessResponse<>(object), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping(value="/object/{name}")
+    @DeleteMapping(value="/object")
     public ResponseEntity<IResponse> DeleteObject(
-        @PathVariable(value="name") String name
+            @RequestBody ObjectRequest request
     ){
         try{
-            if(objectHelper.DoesObjectExists(name)){   
-                objectHelper.DeleteObject(name);
+            ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+            if(service.DoesObjectExists(dto)){
+                service.DeleteObject(dto);
             }
-            return new ResponseEntity<>(new SuccessResponse<>("success"), HttpStatus.OK);
+            return new ResponseEntity<>(new SuccessResponse<>("delete success"), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -77,7 +72,7 @@ public class ObjectController {
     @GetMapping(value="/objects", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> ListObjects(){
         try{
-            List<String> response = objectHelper.ListObjects();
+            List<String> response = service.ListObjects(new ObjectDTO());
             if(response == null){
                 return new ResponseEntity<>(new ErrorResponse("Empty bucket."), HttpStatus.EXPECTATION_FAILED);
             }
@@ -87,16 +82,17 @@ public class ObjectController {
         }
     }
 
-    @GetMapping(value="/object/publish")
+    @GetMapping(value="/object/url")
     public ResponseEntity<IResponse> GetObjectUrl(
-        @RequestParam(value="name", defaultValue="None") String name,
-        @RequestParam(value="expiration-time", defaultValue="90") int expirationTime
+            @RequestParam(value="name", defaultValue="None") String name
     ){
-        if(name == "None"){
+        ObjectRequest tmp = new ObjectRequest().setName(name);
+        ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
+        if(dto.getName() == null){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            URL objectUrl = objectHelper.GetUrl(name, expirationTime);
+            URL objectUrl = service.GetObjectUrl(dto);
             return new ResponseEntity<>(new SuccessResponse<>(objectUrl.toString()), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,13 +101,15 @@ public class ObjectController {
 
     @GetMapping(value="/object/exists")
     public ResponseEntity<IResponse> DoesObjectExists(
-        @RequestParam(value="name", defaultValue="None") String name
+            @RequestParam(value="name", defaultValue="None") String name
     ){
-        if(name == "None"){
+        ObjectRequest tmp = new ObjectRequest().setName(name);
+        ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
+        if(dto.getName() == null){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
         try{
-            if(objectHelper.DoesObjectExists(name)){
+            if(service.DoesObjectExists(dto)){
                 return new ResponseEntity<>(new SuccessResponse<>(true), HttpStatus.OK);
             }
             return new ResponseEntity<>(new SuccessResponse<>(false), HttpStatus.OK);

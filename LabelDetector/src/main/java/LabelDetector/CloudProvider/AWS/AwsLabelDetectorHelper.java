@@ -3,7 +3,6 @@ package LabelDetector.CloudProvider.AWS;
 import LabelDetector.CloudProvider.AWS.JSON.AwsPatternDetected;
 import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 import LabelDetector.CloudProvider.ILabelDetector;
-import com.google.gson.Gson;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.*;
@@ -15,33 +14,14 @@ import java.util.*;
 
 public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected> {
     private RekognitionClient rekClient;
-    private int confidence_threshold = 90;
-    private int maxPattern = 10;
 
     public AwsLabelDetectorHelper(){
         rekClient = RekognitionClient.builder().build();
     }
 
-    public void SetConfidenceThreshold(int confidence){
-        this.confidence_threshold = confidence;
-    }
-
-    public int GetConfidenceThreshold(){
-        return this.confidence_threshold;
-    }
-
-    public void SetMaxPattern(int maxPattern){
-        this.maxPattern = maxPattern;
-    }
-
-    public int GetMaxPattern(){
-        return this.maxPattern;
-    }
-
-    public AwsReckognitionResult Execute(URL imageUrl) throws IllegalArgumentException, IOException {
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern, float confidence_threshold) throws IllegalArgumentException, IOException {
         AwsReckognitionResult result = new AwsReckognitionResult();
         List<AwsPatternDetected> listPattern = new ArrayList<>();
-        Gson g = new Gson();
         // Detect the labels
         List<Label> labels = new ArrayList<>();
         try {
@@ -49,8 +29,9 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
                     .image(Image.builder().bytes(SdkBytes.fromByteArray(IoUtils.toByteArray(is))).build())
-                    .maxLabels(GetMaxPattern())
+                    .maxLabels(maxPattern).minConfidence(confidence_threshold)
                     .build();
+
             // Compute time for loggin
             long startTime = System.currentTimeMillis();
             DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
@@ -67,18 +48,26 @@ public class AwsLabelDetectorHelper implements ILabelDetector<AwsPatternDetected
             throw new IOException("URL not recognized" + e.getMessage());
         }
         // Parse patternList
-        int patternDetected = 0;
         for (Label label : labels) {
-            if (label.confidence() >= confidence_threshold) {
-                listPattern.add(new AwsPatternDetected(label.name(), label.confidence()));
-                patternDetected++;
-                if (patternDetected > maxPattern) {
-                    break;
-                }
-            }
+            listPattern.add(new AwsPatternDetected(label.name(), label.confidence()));
         }
         result.setPatternDetected(listPattern);
         return result;
     }
 
+    public AwsReckognitionResult Analyze(URL imageUrl, int maxPattern) throws IllegalArgumentException, IOException{
+        float confidence_threshold = 90;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
+
+    public AwsReckognitionResult Analyze(URL imageUrl, float confidence_threshold) throws IllegalArgumentException, IOException{
+        int maxPattern = 10;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
+
+    public AwsReckognitionResult Analyze(URL imageUrl) throws IllegalArgumentException, IOException{
+        int maxPattern = 10;
+        float confidence_threshold = 90;
+        return Analyze(imageUrl, maxPattern, confidence_threshold);
+    }
 }
