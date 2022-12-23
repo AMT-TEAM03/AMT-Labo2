@@ -9,6 +9,7 @@ import kong.unirest.Unirest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,10 +45,23 @@ public class API {
         return responseGetURL.getBody().getObject().getString("data");
     }
 
-    public HttpResponse<JsonNode> AnalyzeObject(String imageUrl) throws JsonProcessingException {
+    public HttpResponse<JsonNode> AnalyzeObject(String imageUrl, String imageUri) throws IOException {
         HttpResponse<JsonNode> analyzeResult = Unirest.get(urlLabelApi + "/analyze")
                 .queryString("imageUrl", imageUrl)
                 .asJson();
+
+        assert(analyzeResult.getBody().getObject().getBoolean("success"));
+
+        // Upload result for caching
+        Path tempFile = Files.createTempFile(imageUri, "_Result");
+        try {
+            Files.writeString(tempFile, analyzeResult.getBody().getObject().toString());
+        } catch (IOException e) {
+            Files.delete(tempFile);
+            throw e;
+        }
+
+        CreateObject(imageUri + "_Result", tempFile.toString());
 
         return analyzeResult;
     }
@@ -75,5 +89,23 @@ public class API {
 
         System.out.println(resultSuppPict.getBody());
         System.out.println(resultSuppResult.getBody());
+    }
+
+    public boolean DoesObjectExist(String uri){
+        HttpResponse<JsonNode> response = Unirest.get(urlObjectApi + "/object/exists")
+                .queryString("name", uri)
+                .asJson();
+        return response.getBody().getObject().getString("data") == "true";
+    }
+
+    public void PrepareScenario(int idScenario) throws JsonProcessingException{
+        Map<String, Object> bodyRequest = new HashMap<>();
+        bodyRequest.put("name", Integer.toString(idScenario));
+        String jsonBody = objectMapper.writeValueAsString(bodyRequest);
+        HttpResponse<JsonNode> response = Unirest.post(urlObjectApi + "/prepare-for-scenario")
+                .header("Content-Type", "application/json")
+                .body(jsonBody)
+                .asJson();
+        assert(response.getBody().getObject().getBoolean("data"));
     }
 }

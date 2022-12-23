@@ -117,4 +117,18 @@ public class ObjectController {
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping(value="/prepare-for-scenario")
+    public ResponseEntity<IResponse> PrepareTestScenario(
+        @RequestBody ObjectRequest request
+    ){
+        try{
+            ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+            service.PrepareTestScenario(dto);
+            return new ResponseEntity<>(new SuccessResponse<>(true), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

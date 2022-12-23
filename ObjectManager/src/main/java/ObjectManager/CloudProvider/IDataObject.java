@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
+
 public interface IDataObject {
     /**
      * CreateObject method, will upload an object on the remote storage
@@ -52,4 +54,13 @@ public interface IDataObject {
      * @return true or false depending on object existance
      */
     public boolean DoesObjectExists(String objectKey) throws Exception;
+
+    /**
+     * DeleteBucket method, will delete the main amazon bucket
+     * for testing purpose.
+     *
+     * @param recursive true to empty the existing objects in the bucket before deletion.
+     */
+    public void DeleteBucket(boolean recursive) throws OperationNotSupportedException;
+
 }
