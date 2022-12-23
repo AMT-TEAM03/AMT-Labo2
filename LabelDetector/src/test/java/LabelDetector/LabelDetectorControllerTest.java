@@ -29,12 +29,7 @@ class LabelDetectorControllerTests {
 
     @Test
     public void shouldReturnListTimeAndPatterns() throws Exception {
-        LabelRequest labelRequest = new LabelRequest()
-                .setImageUrl(imageUrl);
-        mockMvc.perform(get("/v1/analyze")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(labelRequest))
-                ).andExpect(status().isOk())
+        mockMvc.perform(get("/v1/analyze?imageUrl=" + imageUrl)).andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"time\":")))
                 .andExpect(content().string(containsString("\"name\":")))
                 .andExpect(content().string(containsString("\"confidence\":")));
@@ -43,20 +38,7 @@ class LabelDetectorControllerTests {
 
     @Test
     public void shouldNotReturnListTimeAndPatterns() throws Exception {
-        LabelRequest labelRequest = new LabelRequest()
-                .setImageUrl("https://www.google.ch");
-        mockMvc.perform(get("/v1/analyze")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(labelRequest))
-                ).andDo(print()).andExpect(status().isBadRequest())
+        mockMvc.perform(get("/v1/analyze?imageUrl=https://www.google.ch")).andDo(print()).andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Reckognition has encountered an issue")));
-    }
-
-    private static String asJsonString(final LabelRequest obj) {
-        try {
-            return new ObjectMapper().setBase64Variant(Base64Variants.getDefaultVariant()).writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
