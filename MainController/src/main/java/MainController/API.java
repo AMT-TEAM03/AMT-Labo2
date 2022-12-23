@@ -45,13 +45,8 @@ public class API {
     }
 
     public HttpResponse<JsonNode> AnalyzeObject(String imageUrl) throws JsonProcessingException {
-        Map<String, Object> analyzeConfig = new HashMap<>();
-        analyzeConfig.put("imageUrl", imageUrl);
-        analyzeConfig.put("maxPattern", 10);
-        analyzeConfig.put("minConfidence", 90);
-
-        HttpResponse<JsonNode> analyzeResult = Unirest.get(urlLabelApi + "/analyze?imageUrl=" + imageUrl)
-                .header("Content-Type", "application/json")
+        HttpResponse<JsonNode> analyzeResult = Unirest.get(urlLabelApi + "/analyze")
+                .queryString("imageUrl", imageUrl)
                 .asJson();
 
         return analyzeResult;
