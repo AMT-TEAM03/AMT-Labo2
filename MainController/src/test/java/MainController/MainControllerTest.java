@@ -87,6 +87,13 @@ class MainControllerTest {
         mockMvc.perform(delete("/v1/object/" + OBJECT_KEY_LIST[0]))
                 .andExpect(status().isOk());
     }
+    
+
+    // Nothing exists
+    @Test
+    public void Nothing_Exist(){
+        
+    }
 
     // UploadObject_ObjectDoesntExist_Success
     /*@Test
