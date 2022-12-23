@@ -12,11 +12,11 @@ on:
   push:
     branches: [ "main", "develop" ]
     paths:
-      - 'LabelDetector/**'
+      - 'MainController/**'
   pull_request:
     branches: [ "main", "develop" ]
     paths:
-      - 'LabelDetector/**'
+      - 'MainController/**'
 
 jobs:
   build:
