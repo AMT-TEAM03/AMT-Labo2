@@ -2,12 +2,10 @@ package MainController;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
-import kong.unirest.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -74,9 +72,8 @@ public class Main {
         // Scenario 3 Everything Exist
 
         // Given
-        api.DeleteObject(imageUri);
-        assert(!api.DoesObjectExist(imageUri));
-        assert(!api.DoesObjectExist(resultUri));
+        assert(api.DoesObjectExist(imageUri));
+        assert(api.DoesObjectExist(resultUri));
 
         // When
         api.CreateObject(imageUri, imagePath);
