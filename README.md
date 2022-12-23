@@ -33,7 +33,7 @@ Le fichier `config` permet de renseigner la région et le format des réponses.
 Le fichier `credentials` permet de renseigner ses identifiants AWS.
 
 Par défaut, nous utilisons le bucket qui nous a été fournis par le professeur. Il est possible de changer le bucket sur 
-lequel nous taravaillons avec la méthode SetBucket.  
+lequel nous taravaillons avec la méthode SetBucket.
 
 ## Tester le projet avec les images déjà prêtes
 Pour lancer le projet le plus simplement possible, ils faut commencer par pull les deux images des microservices, puis les lancer
