@@ -9,6 +9,7 @@ import kong.unirest.Unirest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,32 +38,36 @@ public class API {
     }
 
     public String GetUrl(String uri) {
-        System.out.println("GET URL OBJECT : ");
         HttpResponse<JsonNode> responseGetURL = Unirest.get(urlObjectApi + "/object/url")
                 .queryString("name", uri)
                 .asJson();
         return responseGetURL.getBody().getObject().getString("data");
     }
 
-    public HttpResponse<JsonNode> AnalyzeObject(String imageUrl) throws JsonProcessingException {
-        Map<String, Object> analyzeConfig = new HashMap<>();
-        analyzeConfig.put("imageUrl", imageUrl);
-        analyzeConfig.put("maxPattern", 10);
-        analyzeConfig.put("minConfidence", 90);
-        String jsonBodyAnalyze = objectMapper.writeValueAsString(analyzeConfig);
-
-        HttpResponse<JsonNode> analyzeResult = Unirest.post(urlLabelApi + "/analyze")
-                .header("Content-Type", "application/json")
-                .body(jsonBodyAnalyze)
+    public HttpResponse<JsonNode> AnalyzeObject(String imageUrl, String imageUri) throws IOException {
+        HttpResponse<JsonNode> analyzeResult = Unirest.get(urlLabelApi + "/analyze")
+                .queryString("imageUrl", imageUrl)
                 .asJson();
+
+        assert (analyzeResult.getBody().getObject().getBoolean("success"));
+
+        // Upload result for caching
+        Path tempFile = Files.createTempFile(imageUri, "_Result");
+        try {
+            Files.writeString(tempFile, analyzeResult.getBody().getObject().toString());
+        } catch (IOException e) {
+            Files.delete(tempFile);
+            throw e;
+        }
+
+        CreateObject(imageUri + "_Result", tempFile.toString());
 
         return analyzeResult;
     }
 
     public void DeleteObject(String uri) throws JsonProcessingException {
         Map<String, Object> deletePict = new HashMap<>();
-        deletePict.put("name", "mainTest.jpg");
-        deletePict.put("image", "");
+        deletePict.put("name", uri);
         String jsonBodyDelete = objectMapper.writeValueAsString(deletePict);
 
         HttpResponse<JsonNode> resultSuppPict = Unirest.delete(urlObjectApi + "/object")
@@ -71,8 +76,7 @@ public class API {
                 .asJson();
 
         Map<String, Object> deleteResult = new HashMap<>();
-        deleteResult.put("name", "mainTest_Result.jpg");
-        deleteResult.put("image", "");
+        deleteResult.put("name", uri + "_Result");
         jsonBodyDelete = objectMapper.writeValueAsString(deleteResult);
 
         HttpResponse<JsonNode> resultSuppResult = Unirest.delete(urlObjectApi + "/object")
@@ -80,7 +84,25 @@ public class API {
                 .body(jsonBodyDelete)
                 .asJson();
 
-        System.out.println(resultSuppPict.getBody());
-        System.out.println(resultSuppResult.getBody());
+        assert (resultSuppPict.getBody().getObject().getBoolean("success"));
+        assert (resultSuppResult.getBody().getObject().getBoolean("success"));
+    }
+
+    public boolean DoesObjectExist(String uri) {
+        HttpResponse<JsonNode> response = Unirest.get(urlObjectApi + "/object/exists")
+                .queryString("name", uri)
+                .asJson();
+        return response.getBody().getObject().getString("data") == "true";
+    }
+
+    public void PrepareScenario(int idScenario) throws JsonProcessingException {
+        Map<String, Object> bodyRequest = new HashMap<>();
+        bodyRequest.put("name", Integer.toString(idScenario));
+        String jsonBody = objectMapper.writeValueAsString(bodyRequest);
+        HttpResponse<JsonNode> response = Unirest.post(urlObjectApi + "/prepare-for-scenario")
+                .header("Content-Type", "application/json")
+                .body(jsonBody)
+                .asJson();
+        assert (response.getBody().getObject().getBoolean("data"));
     }
 }

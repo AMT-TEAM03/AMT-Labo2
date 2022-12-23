@@ -8,12 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import ObjectManager.controller.request.ObjectRequest;
 import ObjectManager.dto.ObjectDTO;
@@ -31,7 +26,7 @@ public class ObjectController {
 
     @PostMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> CreateObject(
-        @RequestBody ObjectRequest request
+            @RequestBody ObjectRequest request
     ){
         ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
         if(dto.getName() == null || dto.getImage() == null){
@@ -47,10 +42,11 @@ public class ObjectController {
 
     @GetMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse> DownloadObject(
-        @RequestBody ObjectRequest request
+            @RequestParam(value="name", defaultValue="None") String name
     ){
+        ObjectRequest tmp = new ObjectRequest().setName(name);
         try{
-            ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+            ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
             InputStream object = service.DownloadObject(dto);
             return new ResponseEntity<>(new SuccessResponse<>(object), HttpStatus.OK);
         }catch(Exception e){
@@ -60,14 +56,14 @@ public class ObjectController {
 
     @DeleteMapping(value="/object")
     public ResponseEntity<IResponse> DeleteObject(
-        @RequestBody ObjectRequest request
+            @RequestBody ObjectRequest request
     ){
         try{
             ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
-            if(service.DoesObjectExists(dto)){   
+            if(service.DoesObjectExists(dto)){
                 service.DeleteObject(dto);
             }
-            return new ResponseEntity<>(new SuccessResponse<>("success"), HttpStatus.OK);
+            return new ResponseEntity<>(new SuccessResponse<>("delete success"), HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -88,9 +84,10 @@ public class ObjectController {
 
     @GetMapping(value="/object/url")
     public ResponseEntity<IResponse> GetObjectUrl(
-        @RequestBody ObjectRequest request
+            @RequestParam(value="name", defaultValue="None") String name
     ){
-        ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+        ObjectRequest tmp = new ObjectRequest().setName(name);
+        ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
         if(dto.getName() == null){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
@@ -104,9 +101,10 @@ public class ObjectController {
 
     @GetMapping(value="/object/exists")
     public ResponseEntity<IResponse> DoesObjectExists(
-        @RequestBody ObjectRequest request
+            @RequestParam(value="name", defaultValue="None") String name
     ){
-        ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+        ObjectRequest tmp = new ObjectRequest().setName(name);
+        ObjectDTO dto = new ObjectDTOMapper().mapToModel(tmp);
         if(dto.getName() == null){
             return new ResponseEntity<>(new ErrorResponse("Invalid arguments."), HttpStatus.BAD_REQUEST);
         }
@@ -118,5 +116,19 @@ public class ObjectController {
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping(value="/prepare-for-scenario")
+    public ResponseEntity<IResponse> PrepareTestScenario(
+        @RequestBody ObjectRequest request
+    ){
+        try{
+            ObjectDTO dto = new ObjectDTOMapper().mapToModel(request);
+            service.PrepareTestScenario(dto);
+            return new ResponseEntity<>(new SuccessResponse<>(true), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

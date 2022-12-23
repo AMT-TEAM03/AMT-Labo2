@@ -38,4 +38,16 @@ public class ObjectService {
     public boolean DoesObjectExists(ObjectDTO dto) throws Exception{
         return objectHelper.DoesObjectExists(dto.getName());
     }
+
+    public void PrepareTestScenario(ObjectDTO dto) throws Exception {
+        switch(dto.getName()){
+            case "1":
+                objectHelper.DeleteBucket(true);
+                break;
+            case "2":
+                break;
+            case "3":
+                break;
+        }
+    }
 }

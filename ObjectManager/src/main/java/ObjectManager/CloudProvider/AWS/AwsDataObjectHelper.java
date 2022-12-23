@@ -94,7 +94,7 @@ public class AwsDataObjectHelper implements IDataObject{
             throw new Exception("S3 Client refused the request : " + e.getMessage());
         }
     }
-    
+
     public URL GetUrl(String objectKey) throws Exception{
         String bucketUrl = this.bucketUrl;
         S3Presigner presigner = this.presigner;

@@ -13,6 +13,8 @@ ENV AWS_REGION eu-west-2
 
 WORKDIR /app
 
+EXPOSE 8787
+
 RUN mvn install
 
 CMD mvn exec:java
