@@ -38,7 +38,6 @@ public class API {
     }
 
     public String GetUrl(String uri) {
-        System.out.println("GET URL OBJECT : ");
         HttpResponse<JsonNode> responseGetURL = Unirest.get(urlObjectApi + "/object/url")
                 .queryString("name", uri)
                 .asJson();
@@ -68,8 +67,7 @@ public class API {
 
     public void DeleteObject(String uri) throws JsonProcessingException {
         Map<String, Object> deletePict = new HashMap<>();
-        deletePict.put("name", "mainTest.jpg");
-        deletePict.put("image", "");
+        deletePict.put("name", uri);
         String jsonBodyDelete = objectMapper.writeValueAsString(deletePict);
 
         HttpResponse<JsonNode> resultSuppPict = Unirest.delete(urlObjectApi + "/object")
@@ -78,8 +76,7 @@ public class API {
                 .asJson();
 
         Map<String, Object> deleteResult = new HashMap<>();
-        deleteResult.put("name", "mainTest_Result.jpg");
-        deleteResult.put("image", "");
+        deleteResult.put("name", uri + "_Result");
         jsonBodyDelete = objectMapper.writeValueAsString(deleteResult);
 
         HttpResponse<JsonNode> resultSuppResult = Unirest.delete(urlObjectApi + "/object")
@@ -87,8 +84,8 @@ public class API {
                 .body(jsonBodyDelete)
                 .asJson();
 
-        System.out.println(resultSuppPict.getBody());
-        System.out.println(resultSuppResult.getBody());
+        assert(resultSuppPict.getBody().getObject().getBoolean("success"));
+        assert(resultSuppResult.getBody().getObject().getBoolean("success"));
     }
 
     public boolean DoesObjectExist(String uri){
