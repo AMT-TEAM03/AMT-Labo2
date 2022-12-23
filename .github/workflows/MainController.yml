@@ -10,9 +10,13 @@ name: MainController Maven CI
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
+    paths:
+      - 'LabelDetector/**'
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main", "develop" ]
+    paths:
+      - 'LabelDetector/**'
 
 jobs:
   build:
