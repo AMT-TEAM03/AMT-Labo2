@@ -6,7 +6,7 @@ Gestion du stockage d'objets dans un bucket S3 d'AWS.
 - Seem Thibault
 
 ## Débuter sur le projet
-[Docker](https://www.docker.com) permet de faire tourner les images de ce projet facilement(voir [Lancement d'un conteneur Docker](#Lancement d'un conteneur Docker))
+[Docker](https://www.docker.com) permet de faire tourner les images de ce projet facilement(voir le chapitre Lancement d'un conteneur Docker)
 
 ## Travailler sur le projet en local
 Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable. La marche à suivre se trouve [ici](https://maven.apache.org/install.html)
@@ -173,8 +173,7 @@ Permet de supprimer un objet du bucket
 ### Body
 ```
 {
-    "name" : "nameOfTheFile",
-    "image" : entrée obligatoire, mais peut être laissée vide
+    "name" : "nameOfTheFile"
 }
 ```
 

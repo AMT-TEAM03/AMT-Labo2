@@ -6,7 +6,7 @@ Permet l'utilisation de AWS rekognition pour analiser des images.
 - Seem Thibault
 
 ## Débuter sur le projet
-[Docker](https://www.docker.com) permet de faire tourner les images de ce projet facilement(voir [Lancement d'un conteneur Docker](#Lancement d'un conteneur Docker)).  
+[Docker](https://www.docker.com) permet de faire tourner les images de ce projet facilement(voir le chapitre Lancement d'un conteneur Docker).  
 Pour développer sur ce projet, voir ci-dessous.
 
 ## Travailler sur le projet en local
