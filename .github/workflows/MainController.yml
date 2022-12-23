@@ -10,7 +10,7 @@ name: MainController Maven CI
 
 on:
   workflow_run:
-    workflows: ["LabelDetector Docker CI", "ObjectManager Docker CI"]
+    workflows: ["ObjectManager Docker CI"]
     types:
       - completed
 
