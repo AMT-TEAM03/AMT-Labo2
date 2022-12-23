@@ -32,6 +32,8 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
         cache: maven
+    - name: Run microservices LabelDetector and ObjectManager
+      run: docker run ghcr.io/amt-team03/object-manager:latest; docker run ghcr.io/amt-team03/label-detector:latest
     - name: Build with Maven
       run: mvn -B package --file ./pom.xml -DbuildDirectory=../target; cp pom.xml ../pom.xml
 

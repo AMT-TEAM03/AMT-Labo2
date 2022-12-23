@@ -15,17 +15,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.beans.Transient;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 
 class MainControllerTest {
-    private ObjectMapper mapper = new ObjectMapper();
+    // private ObjectMapper mapper = new ObjectMapper();
 
-    static String _base64Img;
-    static final String[] OBJECT_KEY_LIST = {
-        "testing123.png",
-        "testing1234.png"
-    };
+    // static String _base64Img;
+    // static final String[] OBJECT_KEY_LIST = {
+    //     "testing123.png",
+    //     "testing1234.png"
+    // };
 
     // private void cleanup() throws Exception {
     //     for (String i : OBJECT_KEY_LIST) {
@@ -74,8 +76,10 @@ class MainControllerTest {
 
     // Nothing exists
     @Test
-    public void Nothing_Exist(){
-
+    public void Run_All_Scenarios() throws IOException{
+        String[] dummyArgs = {};
+        final InputStream in = System.in;
+        Main.startIntegrationTests(in, dummyArgs);
     }
 
     // UploadObject_ObjectDoesntExist_Success
