@@ -19,12 +19,12 @@ public class API {
     private String urlLabelApi;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public API(String urlObjectApi, String urlLabelApi){
+    public API(String urlObjectApi, String urlLabelApi) {
         this.urlObjectApi = urlObjectApi;
         this.urlLabelApi = urlLabelApi;
     }
 
-    public HttpResponse<JsonNode> CreateObject(String uri, String filePath) throws IOException{
+    public HttpResponse<JsonNode> CreateObject(String uri, String filePath) throws IOException {
         Map<String, Object> imageConfig = new HashMap<>();
         imageConfig.put("name", uri);
         imageConfig.put("image", Files.readAllBytes(new File(filePath).toPath()));
@@ -49,7 +49,7 @@ public class API {
                 .queryString("imageUrl", imageUrl)
                 .asJson();
 
-        assert(analyzeResult.getBody().getObject().getBoolean("success"));
+        assert (analyzeResult.getBody().getObject().getBoolean("success"));
 
         // Upload result for caching
         Path tempFile = Files.createTempFile(imageUri, "_Result");
@@ -84,18 +84,18 @@ public class API {
                 .body(jsonBodyDelete)
                 .asJson();
 
-        assert(resultSuppPict.getBody().getObject().getBoolean("success"));
-        assert(resultSuppResult.getBody().getObject().getBoolean("success"));
+        assert (resultSuppPict.getBody().getObject().getBoolean("success"));
+        assert (resultSuppResult.getBody().getObject().getBoolean("success"));
     }
 
-    public boolean DoesObjectExist(String uri){
+    public boolean DoesObjectExist(String uri) {
         HttpResponse<JsonNode> response = Unirest.get(urlObjectApi + "/object/exists")
                 .queryString("name", uri)
                 .asJson();
         return response.getBody().getObject().getString("data") == "true";
     }
 
-    public void PrepareScenario(int idScenario) throws JsonProcessingException{
+    public void PrepareScenario(int idScenario) throws JsonProcessingException {
         Map<String, Object> bodyRequest = new HashMap<>();
         bodyRequest.put("name", Integer.toString(idScenario));
         String jsonBody = objectMapper.writeValueAsString(bodyRequest);
@@ -103,6 +103,6 @@ public class API {
                 .header("Content-Type", "application/json")
                 .body(jsonBody)
                 .asJson();
-        assert(response.getBody().getObject().getBoolean("data"));
+        assert (response.getBody().getObject().getBoolean("data"));
     }
 }

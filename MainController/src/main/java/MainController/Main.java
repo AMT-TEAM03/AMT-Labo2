@@ -21,7 +21,7 @@ public class Main {
             urlObjectApi = "http://localhost:9090/v1";
         }else{
             urlLabelApi = args[0];
-            urlObjectApi = args[1];   
+            urlObjectApi = args[1];
         }
 
         String imageUri = "mainTest.jpg";
@@ -42,13 +42,13 @@ public class Main {
         HttpResponse<JsonNode> response = api.AnalyzeObject(imageUrl, imageUri);
         assert(response.getBody().getObject().getBoolean("success"));
 
-        
+
         // Then
         assert(api.DoesObjectExist(imageUri));
         assert(api.DoesObjectExist(resultUri));
 
         System.out.println("Scenario 1, Nothing Exist Passed!");
-        
+
         // Scenario 2 Only Bucket Exist
 
         // Given
@@ -62,7 +62,7 @@ public class Main {
         response = api.AnalyzeObject(imageUrl, imageUri);
         assert(response.getBody().getObject().getBoolean("success"));
 
-        
+
         // Then
         assert(api.DoesObjectExist(imageUri));
         assert(api.DoesObjectExist(resultUri));
@@ -81,7 +81,7 @@ public class Main {
         response = api.AnalyzeObject(imageUrl, imageUri);
         assert(response.getBody().getObject().getBoolean("success"));
 
-        
+
         // Then
         assert(api.DoesObjectExist(imageUri));
         assert(api.DoesObjectExist(resultUri));
