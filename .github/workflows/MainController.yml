@@ -9,14 +9,10 @@
 name: MainController Maven CI
 
 on:
-  push:
-    branches: [ "main", "develop" ]
-    paths:
-      - 'MainController/**'
-  pull_request:
-    branches: [ "main", "develop" ]
-    paths:
-      - 'MainController/**'
+  workflow_run:
+    workflows: ["LabelDetector Docker CI", "ObjectManager Docker CI"]
+    types:
+      - completed
 
 jobs:
   build:
@@ -32,14 +28,6 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
         cache: maven
-    - name: Wait for ObjectManager to finish
-      uses: lewagon/wait-on-check-action@v1.2.0
-      with:
-        ref: ${{ github.ref }}
-        check-name: 'ObjectManager build'
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        wait-interval: 100
-        verbose: true
     - name: Run microservices LabelDetector and ObjectManager
       run: docker run -p 9090:9090 -d ghcr.io/amt-team03/object-manager:latest; docker run -p 8787:8787 -d ghcr.io/amt-team03/label-detector:latest
     - name: Build with Maven
