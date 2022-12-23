@@ -106,11 +106,7 @@ class ObjectControllerTest {
 
     @Test
     public void DoesObjectExist_RootObjectExists_Exists() throws Exception{
-        ObjectRequest objectRequest = new ObjectRequest()
-                .setName(OBJECT_KEY_LIST[0]);
-        MvcResult result = mockMvc.perform(get("/v1/object/exists")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(objectRequest))).andReturn();
+        MvcResult result = mockMvc.perform(get("/v1/object/exists?name=" + OBJECT_KEY_LIST[0])).andReturn();
         assertTrue(result.getResponse().getStatus() == HttpStatus.OK.value());
         SuccessResponse<Boolean> response = mapper.readValue(result.getResponse().getContentAsByteArray(), 
                 SuccessResponse.class);
@@ -119,11 +115,7 @@ class ObjectControllerTest {
 
     @Test
     public void DoesObjectExist_RootObjectAndObjectExist_Exists() throws Exception {
-        ObjectRequest objectRequest = new ObjectRequest()
-                .setName(OBJECT_KEY_LIST[0]);
-        MvcResult result = mockMvc.perform(get("/v1/object/exists")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(objectRequest))).andReturn();
+        MvcResult result = mockMvc.perform(get("/v1/object/exists?name=" + OBJECT_KEY_LIST[0])).andReturn();
         assertTrue(result.getResponse().getStatus() == HttpStatus.OK.value());
         SuccessResponse<Boolean> response = mapper.readValue(result.getResponse().getContentAsByteArray(),
                 SuccessResponse.class);
