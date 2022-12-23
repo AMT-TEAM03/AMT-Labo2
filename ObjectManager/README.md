@@ -13,9 +13,7 @@ Ce projet utilisant maven, il est nécessaire de l'avoir installer au préalable
 
 Une fois maven installé, il faut installer les dépendances avec la commande :
 
-```mvn clean install -DskipTests```  
-  
-Il est également nécessaire de posséder 
+```mvn clean install -DskipTests```
 
 ### Mise en place des settings AWS nécessaires
 Voir la description du [README](../README.md) général du projet pour les configurations d'AWS
