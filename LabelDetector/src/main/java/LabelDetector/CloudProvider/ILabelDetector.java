@@ -1,5 +1,9 @@
 package LabelDetector.CloudProvider;
 
+// pas pénalisé mais en java les packages sont en minuscule normalement. 
+// Vous pouvez les mettre en majuscule si c'est une question d'honneur pour vous 
+// MAIS vous devez à ce moment là mettre des majuscules a TOUS les packages que vous écrivez.
+// en gros soyez uniforme
 import LabelDetector.CloudProvider.AWS.JSON.AwsReckognitionResult;
 
 import java.io.IOException;
