@@ -7,6 +7,7 @@ import LabelDetector.controller.request.LabelRequest;
 import LabelDetector.dto.LabelDTO;
 
 public class LabelDTOMapper {
+    // pas pénalisé mais pourquoi pas static ?
     public LabelDTO mapToModel(LabelRequest request) throws MalformedURLException {
         return new LabelDTO()
                 .setImageUrl(new URL(request.getImageUrl()))

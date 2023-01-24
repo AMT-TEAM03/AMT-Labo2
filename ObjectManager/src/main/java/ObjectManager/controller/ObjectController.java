@@ -24,7 +24,9 @@ public class ObjectController {
     @Autowired
     private ObjectService service;
 
-    @PostMapping(value="/object", produces = MediaType.APPLICATION_JSON_VALUE)
+    // TODO partout : le endpoint "/object" devrait etre au pluriel car il
+    // représente une collection d'objets, la remarque est valable pour tout les
+    // /object
     public ResponseEntity<IResponse> CreateObject(
             @RequestBody ObjectRequest request
     ){
@@ -37,6 +39,7 @@ public class ObjectController {
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        // TODO created devrait retourner un 201 created et non un 200
         return new ResponseEntity<>(new SuccessResponse<>("Image Created."), HttpStatus.OK);
     }
 
@@ -82,7 +85,7 @@ public class ObjectController {
         }
     }
 
-    @GetMapping(value="/object/url")
+    // TODO il vous manque un selecteur dans l'URL du endpoint, on peut discuter de
     public ResponseEntity<IResponse> GetObjectUrl(
             @RequestParam(value="name", defaultValue="None") String name
     ){
@@ -118,7 +121,10 @@ public class ObjectController {
         }
     }
 
-    @PostMapping(value="/prepare-for-scenario")
+    // TODO ça devrait pas être ici. Si vous avez besoin de code spécifique pour run
+    // les tests vous devriez le mettre ailleur
+    // ou AU MINIMUM le désactiver avec un Feature Flag (== bool dans les variables
+    // d'env)
     public ResponseEntity<IResponse> PrepareTestScenario(
         @RequestBody ObjectRequest request
     ){

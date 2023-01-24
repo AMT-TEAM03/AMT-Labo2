@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @NoArgsConstructor
+// élégant, je connaissait pas cette annotation merci !
 @Accessors(chain = true)
 public class LabelRequest {
     private String imageUrl;
